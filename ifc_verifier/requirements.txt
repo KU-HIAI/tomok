@@ -1,0 +1,1 @@
+# ifcopenshell # Go to ifcopenshell.org/python and download the matching IfcOpenShell
