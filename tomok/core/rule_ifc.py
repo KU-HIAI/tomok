@@ -6,7 +6,7 @@ from .results import OKNGResult
 from ..ifc import IFCReader, Product
 
 
-class Rule():
+class RuleIFC():
     priority = 1
     version = 1.0
     author = 'unknown'
@@ -73,17 +73,17 @@ class RuleType(IntEnum):
     REFERENCE = 13
 
 
-class SimpleRule(Rule):
+class SimpleRule(RuleIFC):
     rule_type = RuleType.SIMPLE
 
 
-class CalculateRule(Rule):
+class CalculateRule(RuleIFC):
     rule_type = RuleType.CALCULATE
 
 
-class ReviewRule(Rule):
+class ReviewRule(RuleIFC):
     rule_type = RuleType.REVIEW
 
 
-class RefRule(Rule):
+class RefRule(RuleIFC):
     rule_type = RuleType.REFERENCE

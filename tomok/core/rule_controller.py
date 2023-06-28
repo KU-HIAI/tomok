@@ -6,7 +6,7 @@ from typing import List, Union
 from click import FileError
 # framework
 from .verify_result import VerifyResult
-from .rule import Rule
+from .rule_ifc import RuleIFC
 from ..ifc import IFCReader
 
 import pandas as pd
@@ -17,8 +17,8 @@ class RuleController():
         path = 'rules',
         mode = 'local'
     ):
-        self.rules: List[Rule] = []
-        regex = r"class (.*)\(.*Rule\):"
+        self.rules: List[RuleIFC] = []
+        regex = r"class (.*)\(.*RuleIFC\):"
         if mode == 'local':
             for curpath, subdirs, filenames in os.walk(path):
                 for filename in filenames:
@@ -69,7 +69,7 @@ class RuleController():
     def _prioritize(
         self
     ):
-        """Rule 리스트를 priority에 따라 오름차순으로 정렬한다.
+        """RuleIFC 리스트를 priority에 따라 오름차순으로 정렬한다.
         """
         self.rules = sorted(self.rules, key=lambda r: r.priority)
     
@@ -83,7 +83,7 @@ class RuleController():
     def _verify(
         cls,
         reader: IFCReader,
-        rule: Rule
+        rule: RuleIFC
     ) -> List[VerifyResult]:
         results = list(cls._verify_iter(reader, rule))
         return results
@@ -92,7 +92,7 @@ class RuleController():
     def _verify_iter(
         cls,
         reader: IFCReader,
-        rule: Rule
+        rule: RuleIFC
     ) -> VerifyResult:
         entities = rule.retrieve_entities(reader)
         print(len(entities))
@@ -159,7 +159,7 @@ class RuleController():
     def verify_rule(
         self,
         reader: IFCReader,
-        rule: Rule
+        rule: RuleIFC
     ) -> VerifyResult:
         verify_result = self._verify_iter(reader, rule)
         # print(repr(verify_result))
