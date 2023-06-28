@@ -4,7 +4,7 @@ from enum import Enum
 # 3rd-party
 from ifcopenshell import entity_instance
 # framework
-from .rule import Rule, RuleType
+from .rule_ifc import RuleIFC, RuleType
 from .results import OKNGResult
 from ..ifc import Product
 
@@ -12,7 +12,7 @@ from ..ifc import Product
 class VerifyResult():
     def __init__(
             self,
-            rule: Rule,
+            rule: RuleIFC,
             result: Union[str, OKNGResult],
             entity: Union[Product, entity_instance],
     ):
