@@ -1,18 +1,5 @@
 import inspect
-
-def typename(obj):
-    """
-    Get the typename of object.
-
-    :param obj: Target object.
-    :return: Typename of the obj.
-    """
-    if not isinstance(obj, type):
-        obj = obj.__class__
-    try:
-        return f'{obj.__module__}.{obj.__name__}'
-    except AttributeError:
-        return str(obj)
+from .util import typename, import_check
 
 class RuleUnit():
     priority = 1
@@ -38,9 +25,12 @@ class RuleUnit():
     
 
     def _register_rule_methods(self):
-        print('_register_ru')
-        print(dir(self))
-        method_list = [attr for attr in dir(self) if inspect.isfunction(getattr(self, attr))]
-        print(method_list)
-        print([getattr(self, attr) for attr in dir(self)])
-        typename
+        method_list = [getattr(self, attr) for attr in dir(self) if typename(getattr(self, attr)) == 'tomok.core.decorator.RuleMethod']
+        return method_list
+
+    def render_markdown(self):
+        if not import_check('IPython'):
+            return
+        from IPython.display import display, Markdown
+        display(Markdown('*some markdown* $\phi$'))
+        
