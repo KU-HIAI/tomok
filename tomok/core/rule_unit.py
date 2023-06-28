@@ -32,5 +32,5 @@ class RuleUnit():
         if not import_check('IPython'):
             return
         from IPython.display import display, Markdown
-        display(Markdown('*some markdown* $\phi$'))
+        display(Markdown(self.content))
         
