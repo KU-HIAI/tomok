@@ -20,6 +20,8 @@ class RuleIFC():
     """
     ref_url = "https://www.kcsc.re.kr/"
     filename = ""
+    content = "markdown"
+    flowchart = "mermaid"
     _index = 0
 
     @classmethod
