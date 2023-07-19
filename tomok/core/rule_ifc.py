@@ -3,7 +3,8 @@ from typing import List, Union
 from enum import IntEnum
 # framework
 from .results import OKNGResult
-from ..ifc import IFCReader, Product
+from ..ifc.entity import Product
+from ..ifc.reader import IFCReader
 
 
 class RuleIFC():
