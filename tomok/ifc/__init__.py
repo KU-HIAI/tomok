@@ -1,3 +1,3 @@
 from .reader import IFCReader
-from .product import Product
+from .entity import Product
 from .property_set import PropertySet

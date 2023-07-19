@@ -4,7 +4,7 @@ from enum import Enum
 # 3rd-party
 from ifcopenshell import entity_instance
 # framework
-from .rule import Rule, RuleType
+from .rule_unit import RuleUnit
 from .results import OKNGResult
 from ..ifc import Product
 
@@ -12,11 +12,11 @@ from ..ifc import Product
 class VerifyResult():
     def __init__(
             self,
-            rule: Rule,
+            ruleunit: RuleUnit,
             result: Union[str, OKNGResult],
             entity: Union[Product, entity_instance],
     ):
-        self.rule = rule
+        self.ruleunit = ruleunit
         self.result = result
         self.entity = entity
 
@@ -27,11 +27,11 @@ class VerifyResult():
         if isinstance(self.result, Enum):
             result_str = self.result.name
         return "[{4} : {0} 검사] 결과 : {3} / (#{2}, {1})".format(
-            self.rule.title,
+            self.ruleunit.title,
             self.entity.entity.Name,
             self.entity.entity.id(),
             result_str,
-            self.rule.rule_type.name
+            self.ruleunit.rule_type.name
         )
 
     def to_json(self):
@@ -40,10 +40,10 @@ class VerifyResult():
             result_str = self.result.name
         return {
             'rule': {
-                'index': self.rule._index,
-                'title': self.rule.title,
-                'ref_code': self.rule.ref_code,
-                'ref_date': self.rule.ref_date
+                'index': self.ruleunit._index,
+                'title': self.ruleunit.title,
+                'ref_code': self.ruleunit.ref_code,
+                'ref_date': self.ruleunit.ref_date
             },
             'entity': str(self.entity),
             'result': result_str
