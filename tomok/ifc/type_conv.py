@@ -30,7 +30,9 @@ def ifc_single_value_to_python(
     if type(wrapped_value) is float:
         return float(wrapped_value)
     else:
-        raise TypeError('currently {0} ({1}, {2}) type is not handled in IFCReader'.format(value_type, wrapped_value, type(wrapped_value)))
+        raise TypeError('currently {0} ({1}, {2}) type is not handled in IFCReader'.format(
+            value_type, wrapped_value, type(wrapped_value)))
+
 
 def python_to_ifc_single_value(
     ifc: file,
@@ -47,6 +49,7 @@ def python_to_ifc_single_value(
     new_entity.NominalValue = ifc.create_entity(value_type, value)
     return new_entity
 
+
 def _recognize_value_type(
     value: object
 ):
@@ -59,4 +62,5 @@ def _recognize_value_type(
     if type(value) is int:
         return "IfcInteger"
     else:
-        raise TypeError('currently {0} ({1}) type is not writable in IFCReader'.format(type(value), value))
+        raise TypeError('currently {0} ({1}) type is not writable in IFCReader'.format(
+            type(value), value))

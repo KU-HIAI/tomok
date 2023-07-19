@@ -10,7 +10,7 @@ from ifcopenshell.entity_instance import entity_instance
 
 # framework
 from .property_set import PropertySet
-from .product import Product
+from .entity import Product
 from .util import get_ifc_property_set_from_entity
 
 
@@ -21,9 +21,18 @@ class IFCReader():
         self.fix_escape_char_error(ifc_filepath)
         self.ifc = ifcopenshell.open(ifc_filepath)
 
-
     def fix_escape_char_error(self,
-                              ifc_filepath:str):
+                              ifc_filepath: str):
+        """IFC 파일의 escape char 에러를 완화시키는 함수.
+
+        IFC 파일에 esacpe 글자가 들어갈 경우 ifcopenshell이 fault나고, ifc_verifier 프로그램이 종료되게 됩니다.
+        escape 글자가 빈번히 사용되므로 (예: FILE_NAME에 파일 경로) 해결해야 될 필요성이 있습니다.
+        본 함수는 FILE_NAME의 값을 제거해서 escape 글자 에러를 회피합니다.
+        (주의) 이전 IFC파일은 값을 제거한 IFC 파일로 덮어쓰여지게 됩니다.
+
+        Args:
+            ifc_filepath (str): 검사를 수행할 IFC 파일 경로
+        """
         modified = False
         with open(ifc_filepath, 'r') as fp:
             lines = fp.readlines()
@@ -33,19 +42,18 @@ class IFCReader():
             if line.startswith('FILE_NAME'):
                 lines[idx] = re.sub(regex, r"\g<1>''", line)
                 modified = lines[idx] != line
-                break # FILE_NAME만 고치면 되므로 이후 line은 볼 필요가 없음
+                break  # FILE_NAME만 고치면 되므로 이후 line은 볼 필요가 없음
         if(modified):
             with open(ifc_filepath, 'w') as fp:
                 fp.writelines(lines)
 
-
-    
     @lru_cache
     def _get_ifc_property_set(
         self,
         from_entity: entity_instance
     ) -> List[entity_instance]:
         """특정 entity가 가지고 있는 IfcPropertySet들을 반환
+
         사용 예)
         ```python
         psets = self._get_ifc_property_set(entity)
@@ -58,7 +66,7 @@ class IFCReader():
             List[entity_instance]: IfcPropertySet의 집합
         """
         return get_ifc_property_set_from_entity(self.ifc, from_entity)
-        
+
     def get_ifc_products(
         self,
         ifc_product_type: str = None
@@ -141,8 +149,9 @@ class IFCReader():
         if from_entity:
             return [p_set for p_set in self._get_ifc_property_set(from_entity) if name_filter(p_set.Name)]
         return [p_set for p_set in self.ifc.by_type('IfcPropertySet') if name_filter(p_set.Name)]
-    
+
     # @lru_cache
+
     def get_products(
         self,
         ifc_product_type: str = None,
@@ -153,18 +162,21 @@ class IFCReader():
             if description is None:
                 return True
             else:
-                return description in product._get_descriptions()
+                return description in product.descriptions
+
         def id_filter(product):
             if identification is None:
                 return True
             else:
-                return identification in product._get_identification()
-        products = self.get_ifc_products(ifc_product_type = ifc_product_type)
+                return identification in product.identifications
+        products = self.get_ifc_products(ifc_product_type=ifc_product_type)
         easy_products = [Product(self.ifc, product) for product in products]
-        easy_products = [p for p in easy_products if filter(p) and id_filter(p)]
+        easy_products = [
+            p for p in easy_products if filter(p) and id_filter(p)]
         return easy_products
-    
+
     # @lru_cache
+
     def get_property_set(
         self,
         property_set_name: str = None,
