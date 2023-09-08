@@ -44,6 +44,11 @@ class Product(SupertypeIfcEntityOfPsetAndProp):
         self.IfcProfileDef = IfcArbitraryClosedProfile(
             self.ifc, self.entity, self.tree)
 
+    def get_guid(
+        self
+    ):
+        return self.entity.get_info()['GlobalId']
+
     @property
     def identifications(self):
         return self.tree['identification']
