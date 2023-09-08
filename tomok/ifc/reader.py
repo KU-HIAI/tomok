@@ -20,6 +20,7 @@ class IFCReader():
         # ifcopenshell C language escape character error fix
         self.fix_escape_char_error(ifc_filepath)
         self.ifc = ifcopenshell.open(ifc_filepath)
+        self.guid_product_cache = {}
 
     def fix_escape_char_error(self,
                               ifc_filepath: str):
