@@ -173,10 +173,14 @@ class IFCReader():
         easy_products = [Product(self.ifc, product) for product in products]
         easy_products = [
             p for p in easy_products if filter(p) and id_filter(p)]
+
+        # find guid of all easy_products
+        for e_prod in easy_products:
+            # {guid: product}
+            self.guid_product_cache[e_prod.get_guid()] = e_prod
         return easy_products
 
     # @lru_cache
-
     def get_property_set(
         self,
         property_set_name: str = None,
@@ -188,3 +192,9 @@ class IFCReader():
         )
         easy_psets = [PropertySet(self.ifc, pset) for pset in psets]
         return easy_psets
+
+    def get_product_by_guid(
+        self,
+        guid: str
+    ) -> Product:
+        return self.guid_product_cache[guid]
