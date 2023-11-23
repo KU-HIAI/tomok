@@ -60,23 +60,32 @@ def get_tree(
     Returns:
         dict: from_entity를 참조하는 entity_instances의 트리
     """
-    node_template = {'entity_instances': []}
-    tree = deepcopy(node_template)
-    identifications = []
-    for entity, parents in iter_inverse(ifc=ifc, from_entity=from_entity, filter_is_a=filter_is_a):
-        parsed_entity = ParsedEntity(ifc, entity)
-        cur_node = tree
-        for parent_entity in parents:
-            if parent_entity.is_a() not in cur_node.keys():
-                cur_node[parent_entity.is_a()] = deepcopy(node_template)
-            cur_node = cur_node[parent_entity.is_a()]
-        cur_node['entity_instances'].append(parsed_entity)
-        _pack(cur_node, parsed_entity)
-        _pack_rule_info(cur_node, parsed_entity)
-        if parsed_entity.identifications is not None:
-            identifications.append(parsed_entity.identifications)
-    identifications = sum(identifications, [])
-    tree[from_entity.is_a()]['identification'] = identifications
+    try:
+        node_template = {'entity_instances': []}
+        tree = deepcopy(node_template)
+        tree[from_entity.is_a()] = deepcopy(node_template)
+        _pack(tree, from_entity)
+        _pack_rule_info(tree, from_entity)
+        identifications = []
+        for entity, parents in iter_inverse(ifc=ifc, from_entity=from_entity, filter_is_a=filter_is_a):
+            parsed_entity = ParsedEntity(ifc, entity)
+            cur_node = tree
+            for parent_entity in parents:
+                if parent_entity.is_a() not in cur_node.keys():
+                    cur_node[parent_entity.is_a()] = deepcopy(node_template)
+                cur_node = cur_node[parent_entity.is_a()]
+            cur_node['entity_instances'].append(parsed_entity)
+            _pack(cur_node, parsed_entity)
+            _pack_rule_info(cur_node, parsed_entity)
+            if parsed_entity.identifications is not None:
+                identifications.append(parsed_entity.identifications)
+        identifications = sum(identifications, [])
+        tree[from_entity.is_a()]['identification'] = identifications
+    except Exception as ex:
+        print(tree)
+        print(ex)
+        print(list(iter_inverse(ifc=ifc, from_entity=from_entity, filter_is_a=filter_is_a)))
+        raise Exception()
     return tree[from_entity.is_a()]
 
 
@@ -107,15 +116,16 @@ def _pack(node: dict, parsed_entity: ParsedEntity):
 
 
 def _pack_rule_info(node: dict, parsed_entity: ParsedEntity):
-    packing_process_types = {RuleProcessType.Decision: 'rule_decision',
-                             RuleProcessType.Indirect: 'rule_indirect'}
-    for key in packing_process_types.values():
-        if key not in node.keys():
-            node[key] = []
-    rule_info: RuleInfo = parsed_entity.rule_info
-    if rule_info is None:
-        return
-    if rule_info.process_type in packing_process_types.keys():
-        key = packing_process_types[rule_info.process_type]
-        node[key].append(rule_info)
-        node[key] = sorted(node[key], key=lambda r: r.priority)
+    if hasattr(parsed_entity, 'rule_info'):
+        packing_process_types = {RuleProcessType.Decision: 'rule_decision',
+                                RuleProcessType.Indirect: 'rule_indirect'}
+        for key in packing_process_types.values():
+            if key not in node.keys():
+                node[key] = []
+        rule_info: RuleInfo = parsed_entity.rule_info
+        if rule_info is None:
+            return
+        if rule_info.process_type in packing_process_types.keys():
+            key = packing_process_types[rule_info.process_type]
+            node[key].append(rule_info)
+            node[key] = sorted(node[key], key=lambda r: r.priority)

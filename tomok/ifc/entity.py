@@ -34,10 +34,11 @@ class Product(SupertypeIfcEntityOfPsetAndProp):
     def set_attributes(
         self
     ):
-        self.set_psets(self.tree['pset'])
-        self.decision_rules = self.tree['rule_decision']
-        self.indirect_rules = self.tree['rule_indirect']
-        self.id2rel_class = self.tree['id2rel_class']
+        
+        self.set_psets(self.tree.get('pset', {}))
+        self.decision_rules = self.tree.get('rule_decision', {})
+        self.indirect_rules = self.tree.get('rule_indirect', {})
+        self.id2rel_class = self.tree.get('id2rel_class', {})
         self.IfcStructuralCurveAction = IfcStructuralCurveAction(
             self.ifc, self.entity, self.tree)
         self.IfcMaterial = IfcMaterial(self.ifc, self.entity, self.tree)
@@ -64,18 +65,18 @@ class IfcStructuralCurveAction(SupertypeIfcEntityOfPsetAndProp):
         self.ifc = ifc
         self.entity = from_entity
         if('IfcStructuralCurveAction' in tree.keys()):
-            self.set_psets(tree['IfcStructuralCurveAction']['pset'])
+            self.set_psets(tree['IfcStructuralCurveAction'].get('pset', {}))
 
 
 class IfcMaterial(SupertypeIfcEntityOfPsetAndProp):
     def __init__(self, ifc: file, from_entity: entity_instance, tree: dict):
         self.ifc = ifc
         self.entity = from_entity
-        self.set_psets(tree['material'])
+        self.set_psets(tree.get('material', {}))
 
 
 class IfcArbitraryClosedProfile(SupertypeIfcEntityOfPsetAndProp):
     def __init__(self, ifc: file, from_entity: entity_instance, tree: dict):
         self.ifc = ifc
         self.entity = from_entity
-        self.set_psets(tree['profile'])
+        self.set_psets(tree.get('profile', {}))

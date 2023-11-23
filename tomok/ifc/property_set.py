@@ -68,7 +68,7 @@ class PropertySet():
         else:
             self.property_names = [prop.Name for prop in self._get_props()]
             self.descriptions = {
-                prop.Name: prop.Description for prop in self._get_props() if prop.Description}
+                prop.Name: prop.Description for prop in self._get_props() if hasattr(prop, 'Description')}
 
     def _parse_property_values(
         self
