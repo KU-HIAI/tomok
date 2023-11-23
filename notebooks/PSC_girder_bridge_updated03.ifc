@@ -1,7 +1,7 @@
 ISO-10303-21;
 HEADER;
 FILE_DESCRIPTION(('ViewDefinition [ReferenceView_V1.2]','ExchangeRequirement [Structural]'),'2;1');
-FILE_NAME('0001','2022-05-18T22:31:29+09:00',(''),(''),'ODA SDAI 22.12','23.0.1.318 - Exporter 23.0.1.318 - \X2\B300CCB4\X0\ UI 23.0.1.318','');
+FILE_NAME('','2022-05-18T22:31:29+09:00',(''),(''),'ODA SDAI 22.12','23.0.1.318 - Exporter 23.0.1.318 - \X2\B300CCB4\X0\ UI 23.0.1.318','');
 FILE_SCHEMA(('IFC4'));
 ENDSEC;
 

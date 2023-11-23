@@ -20,7 +20,7 @@ HEADER;
 * EDMstepFileFactory options:     020000
 ******************************************************************************************/
 FILE_DESCRIPTION(('ViewDefinition [ReferenceView_V1.2]','ExchangeRequirement [Structural]'),'2;1');
-FILE_NAME('0001','2021-11-26T10:49:24',(''),(''),'The EXPRESS Data Manager Version 5.02.0100.07 : 28 Aug 2013','22.0.2.392 - Exporter 22.0.2.392 - \X2\B300CCB4\X0\ UI 22.0.2.392','');
+FILE_NAME('','2021-11-26T10:49:24',(''),(''),'The EXPRESS Data Manager Version 5.02.0100.07 : 28 Aug 2013','22.0.2.392 - Exporter 22.0.2.392 - \X2\B300CCB4\X0\ UI 22.0.2.392','');
 FILE_SCHEMA(('IFC4'));
 ENDSEC;
 
