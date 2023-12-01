@@ -11,6 +11,8 @@ def ifc_single_value_to_python(
     # Todo : IfcReal 외 타입도 다룰 수 있어야 함
     if value_type == 'IfcInteger':
         return int(wrapped_value)
+    if value_type == 'IfcCountMeasure':
+        return int(wrapped_value)
     if value_type == 'IfcReal':
         return float(wrapped_value)
     if value_type == 'IfcBoolean':
