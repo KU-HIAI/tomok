@@ -14,6 +14,15 @@ class SupertypeIfcEntityOfPsetAndProp:
         raise AttributeError("{0} property_set is not in {1}. {2}".format(
             key, self, self.property_set_names))
 
+    def __getitem__(self, key):
+        if key not in self.__dict__:
+            raise AttributeError("{0} property_set is not in {1}. {2}".format(
+            key, self, self.property_set_names))
+        return self.__dict__[key]
+
+    def __contains__(self, key):
+        return key in self.__dict__
+
     def __repr__(self):
         return repr(self.entity.wrapped_data)
 

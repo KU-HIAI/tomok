@@ -15,6 +15,7 @@ class PropertySet():
     _protected_keys = []
     property_names = []
     descriptions = {}
+    _name_types = {}
 
     def __init__(
         self,
@@ -44,6 +45,15 @@ class PropertySet():
     ):
         raise AttributeError("{0} property is not in {1}. {2}".format(
             key, self, self.property_names))
+    
+    def __getitem__(self, key):
+        if key not in self.property_names:
+            raise AttributeError("{0} property_set is not in {1}. {2}".format(
+            key, self, self.property_set_names))
+        return self.get_value(key)
+
+    def __contains__(self, key):
+        return key in self.property_names
 
     def __setattr__(
         self,
@@ -66,9 +76,13 @@ class PropertySet():
         if self.entity.__getattr__(self.access) is None:
             self.property_names = []
         else:
-            self.property_names = [prop.Name for prop in self._get_props()]
+            self.property_names = [prop.Name for prop in self._get_props()] + [prop.Specification for prop in self._get_props()]
             self.descriptions = {
-                prop.Name: prop.Description for prop in self._get_props() if hasattr(prop, 'Description')}
+                prop.Name: prop.Description for prop in self._get_props() if hasattr(prop, 'Description')
+            }
+            self.descriptions.update({
+                prop.Specification: prop.Description for prop in self._get_props() if hasattr(prop, 'Description')
+            })
 
     def _parse_property_values(
         self
@@ -83,6 +97,10 @@ class PropertySet():
             else:
                 value = None
             self.__setattr__(prop.Name, value)
+            self._name_types[prop.Name] = 'name'
+            if prop.Specification is not None:
+                self.__setattr__(prop.Specification, value)
+                self._name_types[prop.Name] = 'specification'
 
     @property
     def Name(self):
@@ -152,7 +170,12 @@ class PropertySet():
         key: str
     ) -> entity_instance:
         if self.has_property(key):
-            return [prop for prop in self._get_props() if prop.Name == key][0]
+            if self._name_types[key] == 'name':
+                return [prop for prop in self._get_props() if prop.Name == key][0]
+            elif self._name_types[key] == 'specification':
+                return [prop for prop in self._get_props() if prop.Specification == key][0]
+            else: # default by name
+                return [prop for prop in self._get_props() if prop.Name == key][0]
         raise AttributeError("{0} property is not in {1}. {2}".format(
             key, self, self.property_names))
 
