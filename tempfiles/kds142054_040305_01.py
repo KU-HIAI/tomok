@@ -2,8 +2,8 @@ from typing import List
 import math
 import os
 import sys
-from tomok.core.rule_unit import RuleUnit
-from tomok.core.decorator import rule_method
+from tomok import RuleUnit
+from tomok import rule_method
 
 # import tomok
 

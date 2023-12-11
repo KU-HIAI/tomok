@@ -2,10 +2,9 @@ from typing import List
 import math
 import os
 import sys
-sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 
-from tomok.core.decorator import rule_method
-from tomok.core.rule_unit import RuleUnit
+from tomok import rule_method
+from tomok import RuleUnit
 
 # 작성하는 룰에 맞게 클래스 이름 수정 (KDS142054_040305_03)
 class KDS142054_040305_03 (RuleUnit):
