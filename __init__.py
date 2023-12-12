@@ -8,4 +8,5 @@ from .tomok.core.util import *
 if importlib.util.find_spec("ifcopenshell"):
     from .tomok.core.rule_controller import RuleController
     from .tomok.ifc.reader import IFCReader
+    from .tomok.ifc.entity import Product
     from .tomok.core.rule_ifc import RuleIFC
