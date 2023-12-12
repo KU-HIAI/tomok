@@ -97,21 +97,12 @@ class KDS142054_040305_05 (RuleUnit):
 
         return fOpscpNa
 
-# """작성한 룰 유닛은 아래의 코드 블럭과 같이 생성하여, 작성자가 임의로 검증을 수행할 수 있습니다."""
 
-# my_RuleUnit = KDS142054_040305_05()
-
+# ruleunit = KDS142054_040305_05()
 # fOpscpNa = None
 # fIcamin = 100
 # fIcac = 90
-
-# Rule_Review_Result = my_RuleUnit.modification_factors_for_bonded_anchors_used_in_uncracked_concrete(fOpscpNa,fIcamin,fIcac)
+# Rule_Review_Result = ruleunit.modification_factors_for_bonded_anchors_used_in_uncracked_concrete(fOpscpNa,fIcamin,fIcac)
 # # 해당건설기준 항목 의 결과는?
 
 # print("RuleUnit Review Result: {}".format(Rule_Review_Result))
-
-# """<br><br>
-# 아래의 코드를 통해, 룰 유닛의 content(건설기준 항목의 실제 내용)의 markdown 렌더링 결과를 확인할 수 있습니다.
-# """
-
-# my_RuleUnit.render_markdown()
