@@ -64,7 +64,7 @@ class KDS142054_040305_05 (RuleUnit):
     """
 
     # 작성하는 룰에 맞게 함수 이름과 내용을 수정,
-    @tomok.rule_method
+    @rule_method
     def modification_factors_for_bonded_anchors_used_in_uncracked_concrete(fOpscpNa,fIcamin,fIcac) -> float:
         """비균열 콘크리트에 사용되는 부착식 앵커의 수정계수
 
