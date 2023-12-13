@@ -32,23 +32,35 @@ class RuleUnitController():
                             if self._is_valid_filename(filename):
                                 for match in matches:
                                     cls_name = match.strip()
-                                    module_name = filename.replace(os.path.sep, '.')[:-3]
+                                    module_name = filename[:-3]
                                     import_name = os.path.join(curpath, filename).replace(os.path.sep, '.')[:-3]
+                                    relative_path = os.path.relpath(curpath, path)
                                     ruleunit = getattr(import_module(import_name), cls_name)()
                                     ruleunit.filename = filename
                                     self.ruleunits.append(ruleunit)
 
                                     # Adding object to ruleunits_dict
-                                    if module_name not in self.ruleunits_dict:
-                                        self.ruleunits_dict[module_name] = AttrDict()
-
-                                    self.ruleunits_dict[module_name][cls_name] = ruleunit
+                                    keys = relative_path.split(os.path.sep) + [module_name]
+                                    current_dict = self.ruleunits_dict
+                                    for key in keys:
+                                        if key not in current_dict:
+                                            current_dict[key] = AttrDict()
+                                        current_dict = current_dict[key]
+                                    current_dict[cls_name] = ruleunit
+    
 
     def __getattr__(self, name):
         if name in self.ruleunits_dict:
             return self.ruleunits_dict[name]
         else: 
             raise AttributeError(f"No such attribute: {name}")
+    
+    def __getitem__(self, name):
+        if name in self.ruleunits_dict:
+            return self.ruleunits_dict[name]
+        else: 
+            raise KeyError(f"No such key: {name}")
+    
                        
     
     @classmethod
