@@ -28,7 +28,7 @@ class RuleIFCController():
                         if len(matches) > 0:
                             if self._is_valid_filename(filename):
                                 for match in matches:
-                                    cls_name = match
+                                    cls_name = match.strip()
                                     import_name = os.path.join(curpath, filename).replace(os.path.sep, '.')[:-3]
                                     rule = getattr(import_module(import_name), cls_name)()
                                     rule.filename = filename
