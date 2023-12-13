@@ -11,7 +11,7 @@ from ..ifc import IFCReader
 
 import pandas as pd
 
-class RuleController():
+class RuleIFCController():
     def __init__(
         self,
         path = 'rules',
