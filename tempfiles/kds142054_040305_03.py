@@ -2,10 +2,9 @@ from typing import List
 import math
 import os
 import sys
-sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 
-from tomok.core.decorator import rule_method
-from tomok.core.rule_unit import RuleUnit
+from tomok import rule_method
+from tomok import RuleUnit
 
 # 작성하는 룰에 맞게 클래스 이름 수정 (KDS142054_040305_03)
 class KDS142054_040305_03 (RuleUnit):
@@ -15,7 +14,7 @@ class KDS142054_040305_03 (RuleUnit):
     author = 'Seonghan Yoon'  # 작성자명
     ref_code = 'KDS 14 20 54 4.3.5 (3)' # 건설기준문서
     ref_date = '2021-02-18'  # 디지털 건설문서 작성일
-    doc_date = '2023-10-10'  # 건설기준문서->디지털 건설기준 변환 기준일
+    doc_date = '2023-11-07'  # 건설기준문서->디지털 건설기준 변환 기준일
     title = '인장력의 편심이 작용하는 부착식앵커 그룹에 대한 수정계수'    # 건설기준명
 
     #
@@ -75,10 +74,11 @@ class KDS142054_040305_03 (RuleUnit):
         """
 
         fOpsecNa = 1 / (1+(fIeprimN/fIcNa))
-        if fOpsecNa <= 1:
-          return fOpsecNa
-        else:
-          return "수정계수가 1보다 크다!"
+
+        if fOpsecNa > 1:
+          fOpsecNa = 1.0
+
+        return fOpsecNa
 
 # """작성한 룰 유닛은 아래의 코드 블럭과 같이 생성하여, 작성자가 임의로 검증을 수행할 수 있습니다."""
 

@@ -1,10 +1,10 @@
 import math
 from typing import List
-
-import tomok
+from tomok import rule_method
+from tomok import RuleUnit
 
 # 작성하는 룰에 맞게 클래스 이름 수정 (KDS142054_040305_05)
-class KDS142054_040305_05 (tomok.RuleUnit):
+class KDS142054_040305_05 (RuleUnit):
 
     # 아래 클래스 멤버 변수에 할당되는 값들을 작성하는 룰에 맞게 수정
     priority = 1   # 건설기준 우선순위
@@ -64,7 +64,7 @@ class KDS142054_040305_05 (tomok.RuleUnit):
     """
 
     # 작성하는 룰에 맞게 함수 이름과 내용을 수정,
-    @tomok.rule_method
+    @rule_method
     def modification_factors_for_bonded_anchors_used_in_uncracked_concrete(fOpscpNa,fIcamin,fIcac) -> float:
         """비균열 콘크리트에 사용되는 부착식 앵커의 수정계수
 
