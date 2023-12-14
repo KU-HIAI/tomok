@@ -25,44 +25,38 @@ class RuleIFC():
     flowchart = "mermaid"
     _index = 0
 
-    @classmethod
     def retrieve_entities(
-            cls,
+            self,
             reader: IFCReader
     ) -> List[Product]:
         raise NotImplementedError
 
-    @classmethod
     def pre_process(
-            cls,
+            self,
             entity: Product
     ):
         pass
 
-    @classmethod
     def process(
-            cls,
+            self,
             entity: Product
     ):
         raise NotImplementedError
 
-    @classmethod
     def post_process(
-            cls,
+            self,
             entity: Product
     ):
         pass
 
-    @classmethod
     def make_result(
-            cls,
+            self,
             entity: Product
     ) -> Union[str, OKNGResult]:
         raise NotImplementedError
 
-    @classmethod
     def save_result(
-            cls,
+            self,
             entity: Product,
             result: Union[str, OKNGResult]
     ):

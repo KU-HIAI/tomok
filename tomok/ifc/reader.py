@@ -15,12 +15,14 @@ from .util import get_ifc_property_set_from_entity
 
 
 class IFCReader():
+    guid_product_cache = {}
+
     def __init__(self,
                  ifc_filepath: str):
         # ifcopenshell C language escape character error fix
         self.fix_escape_char_error(ifc_filepath)
         self.ifc = ifcopenshell.open(ifc_filepath)
-        self.guid_product_cache = {}
+        self.get_products()
 
     def fix_escape_char_error(self,
                               ifc_filepath: str):

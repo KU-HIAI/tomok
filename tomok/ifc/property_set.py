@@ -61,6 +61,13 @@ class PropertySet():
         value
     ):
         self.write_property(key, value)
+    
+    def __setitem__(
+        self,
+        key,
+        value
+    ):
+        self.__setattr__(key, value)
 
     def _get_props(
         self

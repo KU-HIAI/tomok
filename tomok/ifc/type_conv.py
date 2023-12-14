@@ -45,7 +45,8 @@ def python_to_ifc_single_value(
 ):
     new_entity = ifc.createIfcPropertySingleValue()
     new_entity.Name = name
-    new_entity.Description = description
+    if description is not None:
+        new_entity.Description = description
     if value_type is None:
         value_type = _recognize_value_type(value)
     new_entity.NominalValue = ifc.create_entity(value_type, value)
