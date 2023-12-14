@@ -4,6 +4,18 @@ from tomok.core.results import OKNGResult
 
 
 class RuleIFC_KDS142054_01(RuleIFC):
+    # 아래 클래스 멤버 변수에 할당되는 값들을 작성하는 룰에 맞게 수정
+    priority = 1   # 건설기준 우선순위
+    author = 'Seonghan Yoon'  # 작성자명
+    ref_code = 'KDS 14 20 54 4.3.5 (1)' # 건설기준문서
+    ref_date = '2021-02-18'  # 디지털 건설문서 작성일
+    doc_date = '2023-10-05'  # 건설기준문서->디지털 건설기준 변환 기준일
+    title = '단일 부착식 앵커의 공칭부착강도'    # 건설기준명
+    description = """
+    descriptions about this rule.
+    """
+    ref_url = "https://www.kcsc.re.kr/"
+
     # RuleIFC 초기화    
     def __init__(self,
                  reader: IFCReader,
