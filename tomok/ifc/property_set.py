@@ -128,7 +128,9 @@ class PropertySet():
         if self._state == self._STAGE.index('writable') and name not in self._protected_keys:
             if self.has_property(name):
                 if description is None:
-                    description = self.get_entity(name).Description
+                    entity = self.get_entity(name)
+                    if hasattr(entity, 'Description'):
+                        description = entity.Description                
                 self.modify_entity(name, value, description)
             else:
                 self.make_entity(name, value, description)
@@ -197,6 +199,7 @@ class PropertySet():
             name=key,
             value=value,
             description=description)
+        self._name_types[key] = 'name'
         if self.entity.__getattr__(self.access) is None:
             self.entity.__setattr__(self.access, [new_entity])
         else:
@@ -216,7 +219,8 @@ class PropertySet():
             entity.NominalValue = self.ifc.create_entity(value_type, value)
         else:
             entity.NominalValue.wrappedValue = value
-        entity.Description = description
+        if description is not None:
+            entity.Description = description
         if description is not None:
             self.descriptions[key] = description
         elif key in self.descriptions.keys():
