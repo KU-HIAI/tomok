@@ -18,7 +18,6 @@ class RuleIFC_KDS142054_01(RuleIFC):
 
     # RuleIFC 초기화    
     def __init__(self,
-                 reader: IFCReader,
                  rule_units: RuleUnitController):
         """
         초기화 함수입니다. IFCReader 객체와 RuleUnitController 객체를 받아서 내부 변수들을 설정합니다.
@@ -27,7 +26,6 @@ class RuleIFC_KDS142054_01(RuleIFC):
             reader (IFCReader): IFC 파일을 읽어오는 객체입니다.
             rule_units (RuleUnitController): Rule unit들을 컨트롤하는 객체입니다.
         """
-        self.reader = reader
         self.runit = {
             '01': rule_units['kds']['142054']['040305_01']['KDS142054_040305_01'],
             '03': rule_units['kds']['142054']['040305_03']['KDS142054_040305_03'],
@@ -37,6 +35,7 @@ class RuleIFC_KDS142054_01(RuleIFC):
 
 
     def retrieve_entities(self,
+                          reader: IFCReader,
                           guid: str):
         """
         주어진 guid를 기반으로 부재를 검색하여 반환합니다.
@@ -48,7 +47,7 @@ class RuleIFC_KDS142054_01(RuleIFC):
             list: 검색된 부재 목록을 반환합니다. 만약 해당 guid를 가진 부재가 없다면 빈 리스트를 반환합니다.
         """
         try:
-            target_entity = [self.reader.get_product_by_guid(guid)] # guid를 기반으로 부재를 검색합니다.
+            target_entity = [reader.get_product_by_guid(guid)] # guid를 기반으로 부재를 검색합니다.
         except:
             return []
         return target_entity
