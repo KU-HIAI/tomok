@@ -1,6 +1,7 @@
 # python
 import os
 import re
+import sys
 from importlib import import_module
 from typing import List, Union
 from click import FileError
@@ -21,6 +22,10 @@ class RuleIFCController():
     ):
         self.rule_ifcs: List[RuleIFC] = []
         regex = r"class (.*)\(.*RuleIFC\):"
+        path_dir = os.path.abspath(path)
+        # RuleUnit 경로를 sys.path에 추가합니다.
+        backup_sys_path = [path for path in sys.path]
+        sys.path = [path_dir]
         if mode == 'local':
             for curpath, subdirs, filenames in os.walk(path):
                 for filename in filenames:
@@ -31,11 +36,12 @@ class RuleIFCController():
                             if self._is_valid_filename(filename):
                                 for match in matches:
                                     cls_name = match.strip()
-                                    import_name = os.path.join(curpath, filename).replace(os.path.sep, '.')[:-3]
+                                    relative_path = os.path.relpath(curpath, path)
+                                    import_name = os.path.join(relative_path, filename).lstrip('./').replace(os.path.sep, '.')[:-3]
                                     rule = getattr(import_module(import_name), cls_name)(rule_units=rule_units)
                                     rule.filename = filename
                                     self.rule_ifcs.append(rule)
-
+        sys.path = [path for path in backup_sys_path]
         self._prioritize()
         self._set_index()
     

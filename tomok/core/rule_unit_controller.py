@@ -1,6 +1,7 @@
 # python
 import os
 import re
+import sys
 from importlib import import_module
 from typing import List
 from click import FileError
@@ -22,6 +23,10 @@ class RuleUnitController():
         self.ruleunits: List[RuleUnit] = []
         self.ruleunits_dict = AttrDict()
         regex = r"class (.*)\(.*RuleUnit\):"
+        path_dir = os.path.abspath(path)
+        # RuleUnit 경로를 sys.path에 추가합니다.
+        backup_sys_path = [path for path in sys.path]
+        sys.path = [path_dir]
         if mode == 'local':
             for curpath, subdirs, filenames in os.walk(path):
                 for filename in filenames:
@@ -33,8 +38,8 @@ class RuleUnitController():
                                 for match in matches:
                                     cls_name = match.strip()
                                     module_name = filename[:-3]
-                                    import_name = os.path.join(curpath, filename).replace(os.path.sep, '.')[:-3]
                                     relative_path = os.path.relpath(curpath, path)
+                                    import_name = os.path.join(relative_path, filename).lstrip('./').replace(os.path.sep, '.')[:-3]
                                     ruleunit = getattr(import_module(import_name), cls_name)()
                                     ruleunit.filename = filename
                                     self.ruleunits.append(ruleunit)
@@ -47,6 +52,7 @@ class RuleUnitController():
                                             current_dict[key] = AttrDict()
                                         current_dict = current_dict[key]
                                     current_dict[cls_name] = ruleunit
+        sys.path = [path for path in backup_sys_path]
     
 
     def __getattr__(self, name):
