@@ -1,0 +1,182 @@
+openapi: 3.0.0
+info:
+  title: TOMOK API
+  version: '1.0'
+servers:
+  - url: https://tomok-dev.hiai.kr/v1.0
+paths:
+  /secret:
+    get:
+      summary: Return secret string
+      operationId: secret.get_secret
+      responses:
+        '200':
+          description: Success response
+          content:
+            'application/json':
+              schema:
+                type: object
+                properties:
+                  msg:
+                    type: string
+                    description: "실행 확인 / 오류 메시지"
+                  type:
+                    type: string
+                    description: "결과 타입"
+                    example: "application/json"
+                  title:
+                    type: string
+                    description: "실행 확인 / 오류 메시지"
+                    example: "ok"
+                  detail:
+                    type: string
+                    description: "실행 확인 / 오류 메시지 (상세)"
+                    example: "ok"
+                  status:
+                    type: integer
+                    description: "HTTP 상태 코드 (200: success, 400: bad request)"
+                    example: 200
+      security:
+        - api_key: []
+  /upload_ifc:
+    post:
+      summary: IFC 파일을 업로드 하고 토큰을 받습니다. 토큰은 룰을 실행할 때 사용합니다. 토큰은 유효기간이 있으며, 유효기간이 지나지 않은 토큰만 실행 가능합니다.
+      operationId: ifc.upload
+      responses:
+        '200':
+          description: Success response
+          content:
+            'application/json':
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                    description: "IFC 파일 토큰 (이후 API 호출 시 필요)"
+                    example: "gAAAAABjO_WD8V9l4L_VJSFonzAOE64jrmJH9ymFoJ2ksoPkX0npc-yYyBqXEFe6DUXplvqvp6b0NLCvCMNZZC57Qg3Ku5vwTNr8RO8tbJ8q3JC9TUhfDliQCF89ce_qF2KiZEDHBbXg"
+                  expired_datetime:
+                    type: string
+                    description: "토큰 유효 기간 (GMT 시간)"
+                    example: ""
+                  detail:
+                    type: string
+                    description: "실행 확인 / 오류 메시지 (상세)"
+                    example: "ok"
+                  status:
+                    type: integer
+                    description: "HTTP 상태 코드 (200: success, 400: bad request)"
+                    example: 200
+      requestBody:
+        content:
+            multipart/form-data:
+              schema:
+                type: object
+                properties:
+                  ifcfile:
+                    type: string
+                    format: binary
+      security:
+        - api_key: []
+  /get_rules:
+    get:
+      summary: 룰 IFC 목록을 확인합니다. 각각의 룰은 고유의 인덱스 값이 있습니다. 토큰과 인덱스 값을 이용해서 특정 룰을 실행할 수 있습니다.
+      operationId: ifc.get_rules
+      responses:
+        '200':
+          description: Success response
+          content:
+            'application/json':
+              schema:
+                type: object
+                properties:
+                  type:
+                    type: string
+                    description: "결과 타입"
+                    example: "application/json"
+                  rules:
+                    type: array
+                    description: "실행 가능 룰 목록"
+                    items:
+                      type: object
+                      properties:
+                        index:
+                          type: integer
+                          example: 0
+                          description: "룰 인덱스 (룰 인덱스를 이용해 특정 룰 실행)"
+                        ref_code:
+                          type: string
+                          example: "KDS 24 14 21 4.6.5.1 (5)"
+                          description: "건설기준 번호"
+                        title:
+                          type: string
+                          example: "바닥판 최소두께"
+                          description: "룰 제목"
+                        author:
+                          type: string
+                          example: "홍길동"
+                          description: "작성자"
+                  detail:
+                    type: string
+                    description: "실행 확인 / 오류 메시지 (상세)"
+                    example: "ok"
+                  status:
+                    type: integer
+                    description: "HTTP 상태 코드 (200: success, 400: bad request)"
+                    example: 200
+      security:
+        - api_key: []
+  /verify:
+      post:
+        summary: 업로드한 IFC 파일의 특정 부재에 룰을 적용하고 그 결과를 받아옵니다. IFC 파일을 지정하기 위해 ifc_upload의 token을 입력합니다. 부재를 지정하기 위해 guid를 입력합니다. 룰은 get_rules에서 얻은 id 값을 입력합니다.
+        operationId: ifc.verify
+        responses:
+          '200':
+            description: Success response
+            content:
+              'application/json':
+                schema:
+                  type: object
+                  properties:
+                    token:
+                      type: string
+                      description: "IFC 파일 토큰 (이후 API 호출 시 필요)"
+                      example: "gAAAAABjO_WD8V9l4L_VJSFonzAOE64jrmJH9ymFoJ2ksoPkX0npc-yYyBqXEFe6DUXplvqvp6b0NLCvCMNZZC57Qg3Ku5vwTNr8RO8tbJ8q3JC9TUhfDliQCF89ce_qF2KiZEDHBbXg"
+                    expired_datetime:
+                      type: string
+                      description: "토큰 유효 기간 (GMT 시간)"
+                      example: ""
+                    detail:
+                      type: string
+                      description: "실행 확인 / 오류 메시지"
+                      example: "ok"
+                    status:
+                      type: integer
+                      description: "HTTP 상태 코드 (200: success, 400: bad request)"
+                      example: 200
+        requestBody:
+          content:
+              multipart/form-data:
+                schema:
+                  type: object
+                  properties:
+                    ifctoken:
+                      type: string
+                      description: "IFC 파일 토큰"
+                      example: ""
+                    ruleid:
+                      type: integer
+                      description: "실행 룰 번호"
+                      example: 1
+                    guid:
+                      type: string
+                      description: "검증 대상 부재 guid"
+                      example: "3s45s2y_vBWuTHL$ihTpyq"
+        security:
+          - api_key: []
+components:
+  securitySchemes:
+    api_key:
+      type: apiKey
+      name: X-Auth
+      in: header
+      x-apikeyInfoFunc: secret.apikey_auth

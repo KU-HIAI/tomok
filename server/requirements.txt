@@ -1,0 +1,15 @@
+# web server
+connexion[swagger-ui]
+connexion[aiohttp]
+aiohttp_cors
+flask_cors
+flask
+tornado
+# hydra
+hydra-core
+hydra-colorlog
+hydra-optuna-sweeper
+# util
+rich
+setproctitle
+cryptography
