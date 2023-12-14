@@ -20,10 +20,9 @@ class RuleIFC_KDS142054_01(RuleIFC):
     def __init__(self,
                  rule_units: RuleUnitController):
         """
-        초기화 함수입니다. IFCReader 객체와 RuleUnitController 객체를 받아서 내부 변수들을 설정합니다.
+        초기화 함수입니다. RuleUnitController 객체를 받아서 필요한 룰 유닛을 정리합니다.
         
         Args:
-            reader (IFCReader): IFC 파일을 읽어오는 객체입니다.
             rule_units (RuleUnitController): Rule unit들을 컨트롤하는 객체입니다.
         """
         self.runit = {
