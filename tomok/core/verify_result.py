@@ -26,12 +26,11 @@ class VerifyResult():
         result_str = self.result
         if isinstance(self.result, Enum):
             result_str = self.result.name
-        return "[{4} : {0} 검사] 결과 : {3} / (#{2}, {1})".format(
+        return "[{0} 검사] 결과 : {3} / (#{2}, {1})".format(
             self.ruleunit.title,
             self.entity.entity.Name,
             self.entity.entity.id(),
-            result_str,
-            self.ruleunit.rule_type.name
+            result_str
         )
 
     def to_json(self):

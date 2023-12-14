@@ -7,6 +7,7 @@ from click import FileError
 # framework
 from .verify_result import VerifyResult
 from .rule_ifc import RuleIFC
+from .rule_unit_controller import RuleUnitController
 from ..ifc import IFCReader
 
 import pandas as pd
@@ -15,9 +16,10 @@ class RuleIFCController():
     def __init__(
         self,
         path = 'rules',
+        rule_units: RuleUnitController = None,
         mode = 'local'
     ):
-        self.rules: List[RuleIFC] = []
+        self.rule_ifcs: List[RuleIFC] = []
         regex = r"class (.*)\(.*RuleIFC\):"
         if mode == 'local':
             for curpath, subdirs, filenames in os.walk(path):
@@ -30,9 +32,9 @@ class RuleIFCController():
                                 for match in matches:
                                     cls_name = match.strip()
                                     import_name = os.path.join(curpath, filename).replace(os.path.sep, '.')[:-3]
-                                    rule = getattr(import_module(import_name), cls_name)()
+                                    rule = getattr(import_module(import_name), cls_name)(rule_units=rule_units)
                                     rule.filename = filename
-                                    self.rules.append(rule)
+                                    self.rule_ifcs.append(rule)
 
         self._prioritize()
         self._set_index()
@@ -44,10 +46,9 @@ class RuleIFCController():
             "priority": rule.priority,
             "ref_code": rule.ref_code,
             "title": rule.title,
-            "type": rule.rule_type.name,
             "author": rule.author,
             "ref_url": rule.ref_url
-        } for rule in self.rules])
+        } for rule in self.rule_ifcs])
 
     def add_rule(
         self,
@@ -71,54 +72,57 @@ class RuleIFCController():
     ):
         """RuleIFC 리스트를 priority에 따라 오름차순으로 정렬한다.
         """
-        self.rules = sorted(self.rules, key=lambda r: r.priority)
+        self.rule_ifcs = sorted(self.rule_ifcs, key=lambda r: r.priority)
     
     def _set_index(
         self
     ):
-        for idx, rule in enumerate(self.rules):
-            rule._index = idx
+        for idx, rule_ifc in enumerate(self.rule_ifcs):
+            rule_ifc._index = idx
     
     @classmethod
     def _verify(
         cls,
         reader: IFCReader,
-        rule: RuleIFC
+        rule_ifc: RuleIFC,
+        guid: str = None,
     ) -> List[VerifyResult]:
-        results = list(cls._verify_iter(reader, rule))
+        results = list(cls._verify_iter(reader, rule_ifc, guid))
         return results
     
     @classmethod
     def _verify_iter(
         cls,
         reader: IFCReader,
-        rule: RuleIFC
+        rule_ifc: RuleIFC,
+        guid: str = None,
     ) -> VerifyResult:
-        entities = rule.retrieve_entities(reader)
+        entities = rule_ifc.retrieve_entities(reader, guid)
         print(len(entities))
-        for entity in rule.retrieve_entities(reader):
+        for entity in entities:
             try:
-                rule.pre_process(entity)
-                rule.process(entity)
-                rule.post_process(entity)
-                result = rule.make_result(entity)
-                rule.save_result(entity, result)
-                yield VerifyResult(rule, result, entity)
+                rule_ifc.pre_process(entity)
+                rule_ifc.process(entity)
+                rule_ifc.post_process(entity)
+                result = rule_ifc.make_result(entity)
+                rule_ifc.save_result(entity, result)
+                yield VerifyResult(rule_ifc, result, entity)
             except Exception as ex:
-                yield VerifyResult(rule, 'ERROR : ' + str(ex), entity)
+                yield VerifyResult(rule_ifc, 'ERROR : ' + str(ex), entity)
 
     def verify_all(
         self,
         reader: IFCReader,
+        guid: str = None,
         return_results: bool = False
     ):
         # TODO : result_strs는 임시로 만든 것임. logger를 이용하도록 변경
         results = []
         result_strs = []
         result_strs.append('검사 시작')
-        for rule in self.rules:
-            result_strs.append('룰 제목 : {0}'.format(rule.title))
-            for verify_result in self._verify_iter(reader, rule):
+        for rule_ifc in self.rule_ifcs:
+            result_strs.append('룰 제목 : {0}'.format(rule_ifc.title))
+            for verify_result in self._verify_iter(reader, rule_ifc, guid):
                 results.append(verify_result)
                 result_str = repr(verify_result)
                 # print(result_str)
@@ -133,6 +137,7 @@ class RuleIFCController():
             self,
             reader: IFCReader,
             idxs : Union[int, List],
+            guid: str = None,
             return_results: bool = False
     ):
         # TODO : result_strs는 임시로 만든 것임. logger를 이용하도록 변경
@@ -142,10 +147,10 @@ class RuleIFCController():
         if type(idxs) is int:
             idxs = [idxs]
         for idx in idxs:
-            rule = self.rules[idx]
-            result_strs.append('룰 제목 : {0}'.format(rule.title))
+            rule_ifc = self.rule_ifcs[idx]
+            result_strs.append('룰 제목 : {0}'.format(rule_ifc.title))
             # print("Rule_index : ", idx)
-            for verify_result in self._verify_iter(reader, rule):
+            for verify_result in self._verify_iter(reader, rule_ifc, guid):
                 results.append(verify_result)
                 result_str = repr(verify_result)
                 # print(result_str)
@@ -159,9 +164,10 @@ class RuleIFCController():
     def verify_rule(
         self,
         reader: IFCReader,
-        rule: RuleIFC
+        rule_ifc: RuleIFC,
+        guid: str = None,
     ) -> VerifyResult:
-        verify_result = self._verify_iter(reader, rule)
+        verify_result = self._verify_iter(reader, rule_ifc, guid)
         # print(repr(verify_result))
         return verify_result
 
