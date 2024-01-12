@@ -4,7 +4,9 @@
 
 ### 설치
 
-1. tomok 라이브러리 설치
+1. (옵션) tomok 라이브러리 설치
+
+`pip install ifcopenshell`
 `pip install ..`
 
 2. 관련 라이브러리 설치

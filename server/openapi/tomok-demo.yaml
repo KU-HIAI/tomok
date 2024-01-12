@@ -57,7 +57,7 @@ paths:
                   expired_datetime:
                     type: string
                     description: "토큰 유효 기간 (GMT 시간)"
-                    example: ""
+                    example: "2023-11-13T05:53:26.721878Z"
                   detail:
                     type: string
                     description: "실행 확인 / 오류 메시지 (상세)"
@@ -126,52 +126,69 @@ paths:
       security:
         - api_key: []
   /verify:
-      post:
-        summary: 업로드한 IFC 파일의 특정 부재에 룰을 적용하고 그 결과를 받아옵니다. IFC 파일을 지정하기 위해 ifc_upload의 token을 입력합니다. 부재를 지정하기 위해 guid를 입력합니다. 룰은 get_rules에서 얻은 id 값을 입력합니다.
-        operationId: ifc.verify
-        responses:
-          '200':
-            description: Success response
+        post:
+          summary: 업로드한 IFC 파일의 특정 부재에 룰을 적용하고 그 결과를 받아옵니다. IFC 파일을 지정하기 위해 ifc_upload의 token을 입력합니다. 부재를 지정하기 위해 guid를 입력합니다. 룰은 get_rules에서 얻은 id 값을 입력합니다.
+          operationId: ifc.verify
+          responses:
+            '200':
+              description: Success response
+              content:
+                'application/json':
+                  schema:
+                    type: object
+                    properties:
+                      results:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            rule:
+                              type: object
+                              properties:
+                                index:
+                                  type: integer
+                                  example: 0
+                                title:
+                                  type: string
+                                  example: "단일 부착식 앵커의 공칭부착강도"
+                                ref_code:
+                                  type: string
+                                  example: "KDS 14 20 54 4.3.5 (1)"
+                                ref_date:
+                                  type: string
+                                  example: "2021-02-18"
+                            entity:
+                              type: string
+                              example: "#206896=IfcBearing('3s45s2y_vBWuTHL$ihTpyq',#18,'Column-1020',$,$,#206895,#206892,'155815',.ELASTOMERIC.)"
+                            result:
+                              type: string
+                              example: "PASS"
+                      detail:
+                        type: string
+                        example: "ok"
+                      status:
+                        type: integer
+                        example: 200
+          requestBody:
             content:
-              'application/json':
-                schema:
-                  type: object
-                  properties:
-                    token:
-                      type: string
-                      description: "IFC 파일 토큰 (이후 API 호출 시 필요)"
-                      example: "gAAAAABjO_WD8V9l4L_VJSFonzAOE64jrmJH9ymFoJ2ksoPkX0npc-yYyBqXEFe6DUXplvqvp6b0NLCvCMNZZC57Qg3Ku5vwTNr8RO8tbJ8q3JC9TUhfDliQCF89ce_qF2KiZEDHBbXg"
-                    expired_datetime:
-                      type: string
-                      description: "토큰 유효 기간 (GMT 시간)"
-                      example: ""
-                    detail:
-                      type: string
-                      description: "실행 확인 / 오류 메시지"
-                      example: "ok"
-                    status:
-                      type: integer
-                      description: "HTTP 상태 코드 (200: success, 400: bad request)"
-                      example: 200
-        requestBody:
-          content:
-              multipart/form-data:
-                schema:
-                  type: object
-                  properties:
-                    ifctoken:
-                      type: string
-                      description: "IFC 파일 토큰"
-                      example: ""
-                    ruleid:
-                      type: integer
-                      description: "실행 룰 번호"
-                      example: 1
-                    guid:
-                      type: string
-                      description: "검증 대상 부재 guid"
-                      example: "3s45s2y_vBWuTHL$ihTpyq"
-        security:
+                multipart/form-data:
+                  schema:
+                    type: object
+                    properties:
+                      ifctoken:
+                        type: string
+                        description: "IFC 파일 토큰"
+                        example: ""
+                      ruleid:
+                        type: integer
+                        description: "실행 룰 번호"
+                        example: 1
+                      guid:
+                        type: string
+                        description: "검증 대상 부재 guid"
+                        example: "3s45s2y_vBWuTHL$ihTpyq"
+          security:
+  
           - api_key: []
 components:
   securitySchemes:

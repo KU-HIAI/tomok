@@ -1,9 +1,9 @@
 # web server
 connexion[swagger-ui]
-connexion[aiohttp]
+connexion[aiohttp]==2.14.1
 aiohttp_cors
 flask_cors
-flask
+flask==2.2.2
 tornado
 # hydra
 hydra-core
@@ -13,3 +13,5 @@ hydra-optuna-sweeper
 rich
 setproctitle
 cryptography
+pandas
+lark
