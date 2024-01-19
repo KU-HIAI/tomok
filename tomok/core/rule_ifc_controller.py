@@ -38,6 +38,8 @@ class RuleIFCController():
                                     cls_name = match.strip()
                                     relative_path = os.path.relpath(curpath, path)
                                     import_name = os.path.join(relative_path, filename).lstrip('./').replace(os.path.sep, '.')[:-3]
+                                    if import_name.startswith('.'):
+                                        import_name = import_name[1:]
                                     rule = getattr(import_module(import_name, package=None), cls_name)(rule_units=rule_units)
                                     rule.filename = filename
                                     self.rule_ifcs.append(rule)
