@@ -38,7 +38,7 @@ class RuleIFCController():
                                     cls_name = match.strip()
                                     relative_path = os.path.relpath(curpath, path)
                                     import_name = os.path.join(relative_path, filename).lstrip('./').replace(os.path.sep, '.')[:-3]
-                                    rule = getattr(import_module(import_name), cls_name)(rule_units=rule_units)
+                                    rule = getattr(import_module(import_name, package='tomok'), cls_name)(rule_units=rule_units)
                                     rule.filename = filename
                                     self.rule_ifcs.append(rule)
         sys.path = [path for path in backup_sys_path]
