@@ -11,12 +11,13 @@ from ifcopenshell.entity_instance import entity_instance
 # framework
 from .property_set import PropertySet
 from .entity import Product
-from .util import get_ifc_property_set_from_entity
+from .util import get_ifc_property_set_from_entity, CaseInsensitiveDefaultDict
 
 
 class IFCReader():
     easy_products_cache = {} 
     guid_product_cache = {}
+    subtype_product_cache = CaseInsensitiveDefaultDict(list)
 
     def __init__(self,
                  ifc_filepath: str):
@@ -161,13 +162,16 @@ class IFCReader():
         for e_prod in self.easy_products_cache:
             # {guid: product}
             self.guid_product_cache[e_prod.get_guid()] = e_prod
+            self.subtype_product_cache[e_prod.get_subtype()].append(e_prod)
+            
 
     # @lru_cache
     def get_products(
         self,
         ifc_product_type: str = None,
         description: str = None,
-        identification: str = None
+        identification: str = None,
+        subtype: str = None
     ) -> List[Product]:
         def type_filter(product):
             if ifc_product_type is None:
@@ -175,7 +179,7 @@ class IFCReader():
             else:
                 return product.entity.is_a(ifc_product_type)
             
-        def filter(product):
+        def desc_filter(product):
             if description is None:
                 return True
             else:
@@ -186,9 +190,20 @@ class IFCReader():
                 return True
             else:
                 return identification in product.identifications
+        
+        def subtype_filter(product):
+            if subtype is None:
+                return True
+            else:
+                return subtype.upper() in product.get_upper_subtype()
 
         easy_products = [
-            p for p in self.easy_products_cache if type_filter(p) and filter(p) and id_filter(p)]
+            p for p in self.easy_products_cache 
+                if type_filter(p) 
+                    and desc_filter(p) 
+                    and id_filter(p) 
+                    and subtype_filter(p)
+        ]
 
         return easy_products
 
@@ -210,3 +225,9 @@ class IFCReader():
         guid: str
     ) -> Product:
         return self.guid_product_cache[guid]
+    
+    def get_products_by_subtype(
+        self,
+        subtype: str
+    ) -> List[Product]:
+        return self.subtype_product_cache[subtype]

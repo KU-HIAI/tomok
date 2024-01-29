@@ -5,6 +5,7 @@ from argparse import ArgumentTypeError
 from functools import reduce
 from pprint import pprint  # for debug
 from copy import deepcopy
+from collections import defaultdict
 
 # 3rd-party
 from ifcopenshell.entity_instance import entity_instance
@@ -287,3 +288,18 @@ def save_result_into_ifc_classification(
         raise ValueError("The number of IFCCLASSIFICATIONREFERENCE referencing {} is {},"
                          " which must be 1".format(product, len(refs)))
     refs[0].ReferencedSource.Description = result.name
+
+
+class CaseInsensitiveDefaultDict(defaultdict):
+    def __init__(self, default_factory=None, **kwargs):
+        super().__init__(default_factory)
+        self.update({(k.upper() if k is not None else k): (v if v is not None else 'None') for k, v in kwargs.items()})
+
+    def __contains__(self, key):
+        return super().__contains__((key.upper() if key is not None else key))
+
+    def __setitem__(self, key, value):
+        super().__setitem__((key.upper() if key is not None else key), (value if value is not None else 'None'))
+
+    def __getitem__(self, key):
+        return super().__getitem__((key.upper() if key is not None else key))

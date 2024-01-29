@@ -48,7 +48,17 @@ class Product(SupertypeIfcEntityOfPsetAndProp):
     def get_guid(
         self
     ):
-        return self.entity.get_info()['GlobalId']
+        return self.entity.GlobalId
+
+    def get_subtype(
+        self
+    ):
+        return self.entity.ObjectType
+
+    def get_upper_subtype(
+        self
+    ):
+        return self.get_subtype().upper() if isinstance(self.get_subtype(), str) else ''
 
     @property
     def identifications(self):
