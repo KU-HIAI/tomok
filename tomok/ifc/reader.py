@@ -15,6 +15,7 @@ from .util import get_ifc_property_set_from_entity
 
 
 class IFCReader():
+    easy_products_cache = {} 
     guid_product_cache = {}
 
     def __init__(self,
@@ -22,7 +23,7 @@ class IFCReader():
         # ifcopenshell C language escape character error fix
         self.fix_escape_char_error(ifc_filepath)
         self.ifc = ifcopenshell.open(ifc_filepath)
-        self.get_products()
+        self.caching()
 
     def fix_escape_char_error(self,
                               ifc_filepath: str):
@@ -153,14 +154,27 @@ class IFCReader():
             return [p_set for p_set in self._get_ifc_property_set(from_entity) if name_filter(p_set.Name)]
         return [p_set for p_set in self.ifc.by_type('IfcPropertySet') if name_filter(p_set.Name)]
 
-    # @lru_cache
+    def caching(self):
+        products = self.get_ifc_products()
+        self.easy_products_cache = [Product(self.ifc, product) for product in products]
+        # find guid of all easy_products
+        for e_prod in self.easy_products_cache:
+            # {guid: product}
+            self.guid_product_cache[e_prod.get_guid()] = e_prod
 
+    # @lru_cache
     def get_products(
         self,
         ifc_product_type: str = None,
         description: str = None,
         identification: str = None
     ) -> List[Product]:
+        def type_filter(product):
+            if ifc_product_type is None:
+                return True
+            else:
+                return product.entity.is_a(ifc_product_type)
+            
         def filter(product):
             if description is None:
                 return True
@@ -172,15 +186,10 @@ class IFCReader():
                 return True
             else:
                 return identification in product.identifications
-        products = self.get_ifc_products(ifc_product_type=ifc_product_type)
-        easy_products = [Product(self.ifc, product) for product in products]
-        easy_products = [
-            p for p in easy_products if filter(p) and id_filter(p)]
 
-        # find guid of all easy_products
-        for e_prod in easy_products:
-            # {guid: product}
-            self.guid_product_cache[e_prod.get_guid()] = e_prod
+        easy_products = [
+            p for p in self.easy_products_cache if type_filter(p) and filter(p) and id_filter(p)]
+
         return easy_products
 
     # @lru_cache
