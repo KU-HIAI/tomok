@@ -40,17 +40,24 @@ class IFCReader():
         """
         modified = False
         with open(ifc_filepath, 'r') as fp:
-            lines = fp.readlines()
-        regex = r"(FILE_NAME\()\'[^\']*\'"
-        for idx in range(len(lines)):
-            line = lines[idx]
-            if line.startswith('FILE_NAME'):
-                lines[idx] = re.sub(regex, r"\g<1>''", line)
-                modified = lines[idx] != line
-                break  # FILE_NAME만 고치면 되므로 이후 line은 볼 필요가 없음
-        if(modified):
-            with open(ifc_filepath, 'w') as fp:
-                fp.writelines(lines)
+            lines = []
+            regex = r"(FILE_NAME\()\'[^\']*\'"
+            for line in fp:
+                if line.startswith('FILE_NAME'):
+                    if re.match(regex, line):
+                        modified_line = re.sub(regex, r"\g<1>''", line)
+                        modified = modified_line != line
+                        if not modified:
+                            break  # FILE_NAME만 고치면 되므로 이후 line은 볼 필요가 없음
+                        else:
+                            lines.append(modified_line)
+                    else:
+                        lines.append(line)
+            if(modified):
+                with open(ifc_filepath, 'w') as fp:
+                    fp.writelines(lines)
+
+    
 
     @lru_cache
     def _get_ifc_property_set(
