@@ -100,7 +100,7 @@ class PropertySet():
             if prop.NominalValue is not None:
                 value_type = prop.NominalValue.get_info()['type']
                 wrapped_value = prop.NominalValue.wrappedValue
-                value = ifc_single_value_to_python(value_type, wrapped_value)
+                value = ifc_single_value_to_python(value_type, wrapped_value, prop)
             else:
                 value = None
             self.__setattr__(prop.Name, value)

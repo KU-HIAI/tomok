@@ -6,34 +6,40 @@ from ifcopenshell.file import file
 
 def ifc_single_value_to_python(
     value_type: str,
-    wrapped_value: object
+    wrapped_value: object,
+    prop: object
 ) -> object:
-    # Todo : IfcReal 외 타입도 다룰 수 있어야 함
-    if value_type == 'IfcInteger':
-        return int(wrapped_value)
-    if value_type == 'IfcCountMeasure':
-        return int(wrapped_value)
-    if value_type == 'IfcReal':
-        return float(wrapped_value)
-    if value_type == 'IfcBoolean':
-        return bool(wrapped_value)
-    if value_type == 'IfcLogical':
-        return bool(wrapped_value)
-    if value_type == 'IfcPlaneAngleMeasure':
-        return float(wrapped_value)
-    if value_type == 'IfcPositiveLengthMeasure':
-        return float(wrapped_value)
-    if value_type == 'IfcLengthMeasure':
-        return float(wrapped_value)
-    if value_type == 'IfcText':
-        return str(wrapped_value)
-    if type(wrapped_value) is str:
-        return wrapped_value
-    if type(wrapped_value) is float:
-        return float(wrapped_value)
-    else:
-        raise TypeError('currently {0} ({1}, {2}) type is not handled in IFCReader'.format(
-            value_type, wrapped_value, type(wrapped_value)))
+    try:
+        if wrapped_value is None:
+            return None
+        if value_type == 'IfcInteger':
+            return int(wrapped_value)
+        if value_type == 'IfcCountMeasure':
+            return int(wrapped_value)
+        if value_type == 'IfcReal':
+            return float(wrapped_value)
+        if value_type == 'IfcBoolean':
+            return bool(wrapped_value)
+        if value_type == 'IfcLogical':
+            return bool(wrapped_value)
+        if value_type == 'IfcPlaneAngleMeasure':
+            return float(wrapped_value)
+        if value_type == 'IfcPositiveLengthMeasure':
+            return float(wrapped_value)
+        if value_type == 'IfcLengthMeasure':
+            return float(wrapped_value)
+        if value_type == 'IfcText':
+            return str(wrapped_value)
+        if type(wrapped_value) is str:
+            return wrapped_value
+        if type(wrapped_value) is float:
+            return float(wrapped_value)
+        else:
+            raise TypeError('currently {0} ({1}, {2}) type is not handled in IFCReader.'.format(
+                value_type, wrapped_value, type(wrapped_value)))
+    except Exception as ex:
+        raise ValueError('parsing value ({0}) with {1} type is not possible. prop:{2}'.format(
+            wrapped_value, value_type, prop))
 
 
 def python_to_ifc_single_value(
