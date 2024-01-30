@@ -48,6 +48,9 @@ class SupertypeIfcEntityOfPsetAndProp:
         return sum([list(pset.descriptions.values()) for pset in self.get_psets() if len(pset.descriptions.values()) > 0], [])
 
     def set_psets(self, psets: dict):
-        self.property_set_names = list(psets.keys())
-        for key, value in psets.items():
-            self.__setattr__(key, value)
+        for property_set_name in psets:
+            self.property_set_names.append(property_set_name)
+            self.__setattr__(property_set_name, psets[property_set_name])
+            if is_decodable(property_set_name):
+                decoded_property_set_name = decode_2byte(property_set_name)
+                self.__setattr__(decoded_property_set_name, psets[property_set_name])
