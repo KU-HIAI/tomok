@@ -6,6 +6,7 @@ from functools import reduce
 from pprint import pprint  # for debug
 from copy import deepcopy
 from collections import defaultdict
+from codecs import getencoder, getdecoder
 
 # 3rd-party
 from ifcopenshell.entity_instance import entity_instance
@@ -303,3 +304,32 @@ class CaseInsensitiveDefaultDict(defaultdict):
 
     def __getitem__(self, key):
         return super().__getitem__((key.upper() if key is not None else key))
+
+
+def encode_2byte(str):
+    encoded_string = "\\X2\\"
+    encoded_bytes = getencoder("utf-16be")(str)[0]
+  
+    for b in encoded_bytes:
+        encoded_string += "{:02X}".format(b)
+  
+    encoded_string += "\\X0\\"
+    return encoded_string
+
+
+def is_decodable(encoded_str):
+    return (encoded_str.startswith("\\X2\\") and encoded_str.endswith("\\X0\\"))
+
+
+def decode_2byte(encoded_str):
+    if not is_decodable(encoded_str):
+        raise ValueError('Invalid format')
+    
+    hex_str = encoded_str[4:-4]
+    
+    bytes_arr = bytearray()
+    for i in range(0, len(hex_str), 2):
+        byte = hex_str[i:i+2]
+        bytes_arr.append(int(byte, 16))
+
+    return getdecoder("utf-16be")(bytes_arr)[0]
