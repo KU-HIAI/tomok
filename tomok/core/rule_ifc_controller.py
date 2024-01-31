@@ -112,9 +112,9 @@ class RuleIFCController():
                 rule_ifc.pre_process(entity)
                 rule_ifc.process(entity)
                 rule_ifc.post_process(entity)
-                result = rule_ifc.make_result(entity)
+                result, log = rule_ifc.make_result(entity)
                 rule_ifc.save_result(entity, result)
-                yield VerifyResult(rule_ifc, result, entity)
+                yield VerifyResult(rule_ifc, result, entity, log)
             except Exception as ex:
                 yield VerifyResult(rule_ifc, 'ERROR : ' + str(ex), entity)
 

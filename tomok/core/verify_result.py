@@ -1,5 +1,5 @@
 # python
-from typing import Union
+from typing import Union, List
 from enum import Enum
 # 3rd-party
 from ifcopenshell import entity_instance
@@ -15,10 +15,12 @@ class VerifyResult():
             ruleunit: RuleUnit,
             result: Union[str, OKNGResult],
             entity: Union[Product, entity_instance],
+            log: List[str] = []
     ):
         self.ruleunit = ruleunit
         self.result = result
         self.entity = entity
+        self.log = log
 
     def __repr__(
             self
@@ -45,5 +47,6 @@ class VerifyResult():
                 'ref_date': self.ruleunit.ref_date
             },
             'entity': str(self.entity),
+            'process_log': self.log,
             'result': result_str
         }
