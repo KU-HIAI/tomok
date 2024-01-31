@@ -16,6 +16,7 @@ class RuleIFC_KDS142054_01(RuleIFC):
     """
     ref_url = "https://www.kcsc.re.kr/"
     log = []
+    init_log = []
 
     # RuleIFC 초기화    
     def __init__(self,
@@ -32,10 +33,11 @@ class RuleIFC_KDS142054_01(RuleIFC):
             '04': rule_units['kds']['142054']['040305_04']['KDS142054_040305_04'],
             '05': rule_units['kds']['142054']['040305_05']['KDS142054_040305_05']
         }
-        self.log.append('KDS 14 20 54 4.3.5 (1): 단일 부착식 앵커의 공장부착강도 검토 시작')
+        self.init_log.append('KDS 14 20 54 4.3.5 (1): 단일 부착식 앵커의 공장부착강도 검토 시작')
         for idx, runit in enumerate(self.runit):
-            self.log.append('검토 항목:')
-            self.log.append("[{0}] {1}: {2}".format(idx+1, self.runit[runit].ref_code, self.runit[runit].title))
+            self.init_log.append('검토 항목:')
+            self.init_log.append("[{0}] {1}: {2}".format(idx+1, self.runit[runit].ref_code, self.runit[runit].title))
+        print(self.init_log)
 
 
     def retrieve_entities(self,
@@ -50,10 +52,19 @@ class RuleIFC_KDS142054_01(RuleIFC):
         Return:
             list: 검색된 부재 목록을 반환합니다. 만약 해당 guid를 가진 부재가 없다면 빈 리스트를 반환합니다.
         """
+        import traceback
+        self.log = [x for x in self.init_log]
         try:
+            print(guid)
             target_entity = [reader.get_product_by_guid(guid)] # guid를 기반으로 부재를 검색합니다.
-            self.log.append("검토 부재: " + target_entity)
-        except:
+            self.log.append("검토 부재: " + str(target_entity[0]))
+        except Exception as ex:
+            print('부재 검색 오류')
+            # 예외 메시지 출력
+            print(f'Exception message: {str(ex)}')
+        
+            # 스택 추적 정보 출력
+            traceback.print_exc()
             return []
         return target_entity
 
@@ -143,9 +154,13 @@ class RuleIFC_KDS142054_01(RuleIFC):
                                         krpset_name="KRPset_KDS 14 20 54_4.3.5 (3)",
                                         en_name="The distance from the center of the anchor to the edge of the projected influence area required to develop the maximum bond strength")
                 fOpsecNa = self.runit['03'].correction_factor_for_attached_anchor_groups_with_eccentricity_of_tensile_force(0, fIeprimN, fIcNa)
-                self.log('룰 유닛 실행: '+ self.runit['03'])
-                self.log(f'correction_factor_for_attached_anchor_groups_with_eccentricity_of_tensile_force({0}, {fIeprimN}, {fIcNa})')
-                self.log(f'계산 결과 : {fOpsecNa}')
+                print(self.log)
+                self.log.append('룰 유닛 실행: '+ self.runit['03'].ref_code)
+                print(self.log)
+                self.log.append(f'correction_factor_for_attached_anchor_groups_with_eccentricity_of_tensile_force({0}, {fIeprimN}, {fIcNa})')
+                print(self.log)
+                self.log.append(f'계산 결과 : {fOpsecNa}')
+                print(self.log)
                 self._set_p_value(entity=entity,
                                 krpset_name="KRPset_KDS 14 20 54_4.3.5 (3)",
                                 en_name="fPosecNa",
@@ -164,9 +179,9 @@ class RuleIFC_KDS142054_01(RuleIFC):
                                         krpset_name="KRPset_KDS 14 20 54_4.3.5 (4)",
                                         en_name="The distance from the center of the anchor to the edge of the projected influence area required to develop the maximum bond strength")
                 fOpsedNa = self.runit['04'].correction_factor_for_edge_influence_of_single_or_group_of_anchor(0, fIcamin, fIcNa)
-                self.log('룰 유닛 실행: '+ self.runit['04'])
-                self.log(f'correction_factor_for_edge_influence_of_single_or_group_of_anchor({0}, {fIcamin}, {fIcNa})')
-                self.log(f'계산 결과 : {fOpsedNa}')
+                self.log.append('룰 유닛 실행: '+ self.runit['04'].ref_code)
+                self.log.append(f'correction_factor_for_edge_influence_of_single_or_group_of_anchor({0}, {fIcamin}, {fIcNa})')
+                self.log.append(f'계산 결과 : {fOpsedNa}')
                 self._set_p_value(entity=entity,
                                 krpset_name="KRPset_KDS 14 20 54_4.3.5 (4)",
                                 en_name="fOpsedNa",
@@ -185,9 +200,9 @@ class RuleIFC_KDS142054_01(RuleIFC):
                                         krpset_name="KRPset_KDS 14 20 54_4.3.5 (5)",
                                         en_name="risk podium distance")
                 fOpscpNa = self.runit['05'].modification_factors_for_bonded_anchors_used_in_uncracked_concrete(0, fIcamin, fIcac)
-                self.log('룰 유닛 실행: '+ self.runit['05'])
-                self.log(f'modification_factors_for_bonded_anchors_used_in_uncracked_concrete({0}, {fIcamin}, {fIcac})')
-                self.log(f'계산 결과 : {fOpscpNa}')
+                self.log.append('룰 유닛 실행: '+ self.runit['05'].ref_code)
+                self.log.append(f'modification_factors_for_bonded_anchors_used_in_uncracked_concrete({0}, {fIcamin}, {fIcac})')
+                self.log.append(f'계산 결과 : {fOpscpNa}')
                 self._set_p_value(entity=entity,
                                 krpset_name="KRPset_KDS 14 20 54_4.3.5 (5)",
                                 en_name="fOpscpNa",
@@ -253,9 +268,9 @@ class RuleIFC_KDS142054_01(RuleIFC):
                                         en_name="Characteristics Adhesion strength of adhesive anchors used in uncracked concrete")
             fIuserdefined = 1
             result = self.runit['01'].nominal_bond_strength_of_a_single_bonded_anchor(fINa,fINag,fIANa,fIANao,fIpsedNa,fIpscpNa,fINba,fIpsecNa,fIn,fIcNa,fIda,fItauncr,fIuserdefined)
-            self.log('룰 유닛 실행: '+ self.runit['01'])
-            self.log(f'nominal_bond_strength_of_a_single_bonded_anchor({fINa}, {fINag}, {fIANa}, {fIANao}, {fIpsedNa},{fIpscpNa},{fINba},{fIpsecNa},{fIn},{fIcNa},{fIda},{fItauncr},{fIuserdefined})')
-            self.log(f'계산 결과 : {result}')
+            self.log.append('룰 유닛 실행: '+ self.runit['01'].ref_code)
+            self.log.append(f'nominal_bond_strength_of_a_single_bonded_anchor({fINa}, {fINag}, {fIANa}, {fIANao}, {fIpsedNa},{fIpscpNa},{fINba},{fIpsecNa},{fIn},{fIcNa},{fIda},{fItauncr},{fIuserdefined})')
+            self.log.append(f'계산 결과 : {result}')
             
             # make_result에서 사용하도록 저장
             self._set_p_value(entity=entity,
@@ -288,8 +303,8 @@ class RuleIFC_KDS142054_01(RuleIFC):
                               en_name="result")
         # OKNGResult 형식으로 변환 후 반환
         if result == "Pass":
-            self.log("검토 결과: {OKNGResult.PASS}")
+            self.log.append("검토 결과: {OKNGResult.PASS}")
             return OKNGResult.PASS, self.log
         elif result == "Fail":
-            self.log("검토 결과: {OKNGResult.FAIL}")
+            self.log.append("검토 결과: {OKNGResult.FAIL}")
             return OKNGResult.FAIL, self.log
