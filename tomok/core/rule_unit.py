@@ -3,6 +3,9 @@ import requests
 import json
 import base64
 import zlib
+import re
+import ast
+import textwrap
 from .util import typename, import_check
 
 class RuleUnit():
@@ -87,4 +90,90 @@ class RuleUnit():
             return
         from IPython.display import display, Markdown
         display(Markdown(self.content))
+    
+
+    def _find_docstring_variables(self, func):
+        """Find variables in the given function's docstring."""
+        docstring = inspect.getdoc(func)
+        
+        # Define regex patterns for args and variable names/descriptions
+        arg_pattern = re.compile(r"Args:\n(.+?)(\n\n|$)", re.S)
+        var_pattern = re.compile(r"(\w+)\s\(([\w.]+)\)")
+        
+        arg_block_match = arg_pattern.search(docstring)
+        
+        if arg_block_match:
+            arg_block = arg_block_match.group(1)
+            return var_pattern.findall(arg_block)
+        else:
+            return []
+
+    def _get_source_body(self, func):
+        source = inspect.getsource(func)
+
+        index = source.find('"""')
+        if index != -1:  # '"""' 가 존재하는 경우라면,
+            # 다음 '"""' 의 위치 찾기
+            end_index = source.find('"""', index + 3) 
+            if end_index != -1: # 이것도 존재한다면,
+                # 첫번째 '"""' 와 두번째 '"""' 사이에 있는 것을 모두 제거
+                source = source[end_index + 3:]
+                return source
+    
+    def _get_source_vars(self, source):
+        source = textwrap.dedent(source).strip()
+        class VarExtractor(ast.NodeVisitor):
+            def __init__(self):
+                self.names = set()
+
+            def visit_Name(self, node):
+                self.names.add(node.id)
+
+        extractor = VarExtractor()
+        extractor.visit(ast.parse(source))
+        return extractor.names
+
+    def verify(self):
+        # 메타 데이터 검증
+        for rule_method in self.rule_methods:
+            # 기반 데이터 준비
+            func = rule_method.fn
+            docstring = inspect.getdoc(func)
+            body = inspect.getsource(func)
+            source = self._get_source_body(func)
+            
+            # 룰 인자 검증
+            print("\033[1m[룰 입력 인자 검증]\033[0m")
+            input_list = list(inspect.signature(func).parameters.keys())
+            print("- 함수에 정의된 인자 리스트: ", input_list)
+            docstring_variables = [var[0] for var in self._find_docstring_variables(func)]
+            print("- docstring에 정의된 인자 리스트: ", docstring_variables)
+            is_variables_matched = set(docstring_variables) == set(input_list)
+            if(is_variables_matched):
+                print('\033[92m' + '[통과]' + '\033[0m' + ' 함수와 docstring 인자 일치')
+            else:
+                print('\033[91m' + '[오류]' + '\033[0m' + ' 함수와 docstring 인자 불일치')
+            
+            # 입력 인자에 userdefined 있는지 여부
+            has_userdefined = False
+            for input_name in input_list:
+                if "userdefined" in input_name.lower():
+                    has_userdefined = True
+            if(not has_userdefined):
+                print('\033[92m' + '[통과]' + '\033[0m' + ' UserDefined 인자 불검출')
+            else:
+                print('\033[91m' + '[오류]' + '\033[0m' + ' UserDefined 인자 검출')
+            
+            # 모든 입력 인자의 사용 여부 검사
+            source_vars = self._get_source_vars(source)
+            print("- 소스코드에 사용된 인자 리스트: ", source_vars)
+            all_variable_used = len(set(input_list).difference(set(source_vars))) == 0
+            if(all_variable_used):
+                print('\033[92m' + '[통과]' + '\033[0m' + ' 입력 인자 모두 사용')
+            else:
+                print('\033[91m' + '[오류]' + '\033[0m' + ' 미사용 입력 인자 존재')
+
+            
+        # 룰 실행여부 검증
+
         
