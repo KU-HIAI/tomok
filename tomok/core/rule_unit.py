@@ -33,7 +33,7 @@ class RuleUnit():
     
 
     def _register_rule_methods(self):
-        method_list = [getattr(self, attr) for attr in dir(self) if typename(getattr(self, attr)) == 'tomok.core.decorator.RuleMethod']
+        method_list = [getattr(self, attr) for attr in dir(self) if typename(getattr(self, attr)) == 'tomok.core.decorator.RuleMethod' or typename(getattr(self, attr)) == 'tomok.tomok.core.decorator.RuleMethod']
         return method_list
 
 
