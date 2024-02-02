@@ -155,6 +155,10 @@ class RuleUnit():
         print("...under construction...")
         print("")
 
+        print("\033[1m[룰 유닛 함수 목록]\033[0m")
+        print(self.rule_methods)
+        print("")
+
         for rule_method in self.rule_methods:
             # 기반 데이터 준비
             func = rule_method.fn
