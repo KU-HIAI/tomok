@@ -7,6 +7,7 @@ import re
 import ast
 import textwrap
 from .util import typename, import_check
+from .results import ResultBase
 
 class RuleUnit():
     priority = 1
@@ -133,8 +134,27 @@ class RuleUnit():
         extractor.visit(ast.parse(source))
         return extractor.names
 
+    def wrap_value(self, type_str, value):
+        type_dict = {
+            'int': int,
+            'float': float,
+            'str': str,
+            'bool': bool,
+            'list': list,
+            'tuple': tuple,
+            'dict': dict,
+            'set': set,
+            # 더 많은 타입들을 이곳에 추가하면 됩니다.
+        }
+        return type_dict[type_str](value)
+
+
     def verify(self):
         # 메타 데이터 검증
+        print("\033[1m[메타 데이터 검증]\033[0m")
+        print("...under construction...")
+        print("")
+
         for rule_method in self.rule_methods:
             # 기반 데이터 준비
             func = rule_method.fn
@@ -144,11 +164,13 @@ class RuleUnit():
             
             # 룰 인자 검증
             print("\033[1m[룰 입력 인자 검증]\033[0m")
-            input_list = list(inspect.signature(func).parameters.keys())
+            params = inspect.signature(func).parameters
+            input_list = list(params.keys())
             print("- 함수에 정의된 인자 리스트: ", input_list)
-            docstring_variables = [var[0] for var in self._find_docstring_variables(func)]
-            print("- docstring에 정의된 인자 리스트: ", docstring_variables)
-            is_variables_matched = set(docstring_variables) == set(input_list)
+            docstring_params = self._find_docstring_variables(func)
+            docstring_params = {var[0]:var[1] for var in docstring_params}
+            print("- docstring에 정의된 인자 리스트: ", docstring_params)
+            is_variables_matched = set(docstring_params.keys()) == set(input_list)
             if(is_variables_matched):
                 print('\033[92m' + '[통과]' + '\033[0m' + ' 함수와 docstring 인자 일치')
             else:
@@ -172,8 +194,33 @@ class RuleUnit():
                 print('\033[92m' + '[통과]' + '\033[0m' + ' 입력 인자 모두 사용')
             else:
                 print('\033[91m' + '[오류]' + '\033[0m' + ' 미사용 입력 인자 존재')
+                print('\033[91m' + '[미사용 인자]' + '\033[0m', set(input_list).difference(set(source_vars)))
+            print("")
 
+            # 룰 실행여부 검증
+            print("\033[1m[룰 실행 여부 검증]\033[0m")
+            user_input = {}
+            for param in input_list:
+                user_input[param] = input(f"{param} 인자의 값을 넣어주세요 : ")
+                try:
+                    user_input[param] = self.wrap_value(docstring_params[param], user_input[param])
+                    print(f"{param}: {user_input[param]}")
+                except Exception as ex:
+                    print('\033[91m' + '[오류]' + '\033[0m' + ' 인자 형 변환 실패')
+                    print(ex)
+            try:
+                result = func(**user_input)
+                print('\033[92m' + '[통과]' + '\033[0m' + ' 룰 실행 확인')
+            except Exception as ex:
+                print('\033[91m' + '[오류]' + '\033[0m' + ' 룰 실행 실패')
+                print(ex)
+            print("")
             
-        # 룰 실행여부 검증
-
+            # 룰 반환형 검사
+            print("\033[1m[룰 반환 데이터 검증]\033[0m")
+            print("결과:", result)
+            if isinstance(result, ResultBase):
+                print('\033[92m' + '[통과]' + '\033[0m' + ' 반환 자료형 확인')
+            else:
+                print('\033[91m' + '[오류]' + '\033[0m' + ' 반환 자료은 ResultBase, PassFailResult, SingleValueResult, MultiValueResult 등 이어야 합니다.')
         
