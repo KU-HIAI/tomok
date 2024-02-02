@@ -1,3 +1,4 @@
+from typing import Optional
 import inspect
 import requests
 import json
@@ -10,22 +11,23 @@ from .util import typename, import_check
 from .results import ResultBase
 
 class RuleUnit():
-    priority = 1
-    version = 1.0
-    author = 'unknown'
-    ref_code = 'KDS # # #'
-    ref_date = 'YYYY-MM-DD'
-    identification_code = 'D # # #'
-    rule_type = 'TBD'
-    title = ''
-    description = """
+    priority:int = 1
+    version:float = 1.0
+    acc_able:Optional[bool] = None
+    author:str = 'unknown'
+    ref_code:str = 'KDS # # #'
+    ref_date:str = 'YYYY-MM-DD'
+    identification_code:str = 'D # # #'
+    rule_type:str = 'TBD'
+    title:str = ''
+    description:str = """
     descriptions about this rule.
     """
-    ref_url = "https://www.kcsc.re.kr/"
-    filename = ""
-    _index = 0
-    flowchart = ""
-    content = ""
+    ref_url:str = "https://www.kcsc.re.kr/"
+    filename:str = ""
+    _index:int = 0
+    flowchart:str = ""
+    content:str = ""
 
 
     def __init__(self):
@@ -152,7 +154,11 @@ class RuleUnit():
     def verify(self):
         # 메타 데이터 검증
         print("\033[1m[메타 데이터 검증]\033[0m")
-        print("...under construction...")
+        print("acc_able: ", self.acc_able)
+        if self.acc_able is not None:
+            print('\033[92m' + '[통과]' + '\033[0m' + ' acc 가능여부가 설정되어 있습니다.')
+        else:
+            print('\033[91m' + '[오류]' + '\033[0m' + ' 메타데이터에 acc_able (ACC 가능여부)가 설정되어야 합니다. ACC 가능일 경우 True 아닌 경우 False 값을 설정해야 합니다.')
         print("")
 
         print("\033[1m[룰 유닛 함수 목록]\033[0m")
@@ -173,7 +179,7 @@ class RuleUnit():
             print("- 함수에 정의된 인자 리스트: ", input_list)
             docstring_params = self._find_docstring_variables(func)
             docstring_params = {var[0]:var[1] for var in docstring_params}
-            print("- docstring에 정의된 인자 리스트: ", docstring_params)
+            print("- docstring에 정의된 인자 리스트: ", docstring_params.keys())
             is_variables_matched = set(docstring_params.keys()) == set(input_list)
             if(is_variables_matched):
                 print('\033[92m' + '[통과]' + '\033[0m' + ' 함수와 docstring 인자 일치')
