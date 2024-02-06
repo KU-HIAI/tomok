@@ -209,6 +209,11 @@ class RuleUnit():
 
             # 룰 실행여부 검증
             print("\033[1m[룰 실행 여부 검증]\033[0m")
+            if(len(set(input_list).difference(set(docstring_params.keys()))) > 0):
+                print('\033[91m' + '[오류]' + '\033[0m' + ' 입력 인자 중 일부가 docstring에 기재되어 있지 않습니다. 자료형(예: float, str, int)을 알 수 없으므로 룰 실행 여부 검정이 불가합니다.')
+                print(set(input_list).difference(set(docstring_params.keys())))
+                print('\033[91m' + '위 인자에 대한 docstring 작성 후 다시 실행 해주시기 바랍니다.' + '\033[0m')
+                return
             user_input = {}
             for param in input_list:
                 user_input[param] = input(f"{param} 인자의 값을 넣어주세요 : ")
