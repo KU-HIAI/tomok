@@ -106,6 +106,23 @@ class RuleUnit:
             return var_pattern.findall(arg_block)
         else:
             return []
+    
+    def _find_return_docstring_variables(self, func):
+        """Find return variables in the given function's docstring."""
+        docstring = inspect.getdoc(func)
+    
+        # Define regex patterns for returns and variable names/descriptions
+        return_pattern = re.compile(r"Returns:\n(.+?)(\n\n|$)", re.S)
+        var_pattern = re.compile(r"(\w+)\s\(([\w.]+)\)")
+    
+        return_block_match = return_pattern.search(docstring)
+    
+        if return_block_match:
+            return_block = return_block_match.group(1)
+            return var_pattern.findall(return_block)
+        else:
+            return []
+    
 
     def _get_source_body(self, func):
         source = inspect.getsource(func)
@@ -239,6 +256,8 @@ class RuleUnit:
 
             # 룰 반환형 검사
             print("\033[1m[룰 반환 데이터 검증]\033[0m")
+            docstring_return_params = self._find_return_docstring_variables(func)
+            docstring_return_params = {var[0]: var[1] for var in docstring_return_params}
             print("결과:", result)
             if isinstance(result, ResultBase):
                 print("\033[92m" + "[통과]" + "\033[0m" + " 반환 자료형 확인")
@@ -247,3 +266,8 @@ class RuleUnit:
                 print(
                     "\033[91m" + "[오류]" + "\033[0m" + " 반환 자료는 RuleUnitResult 이어야 합니다."
                 )
+                return
+            if len(set(result.result_variables.keys()).difference(set(docstring_return_params))) > 0:
+                print('\033[91m' + '[오류]' + '\033[0m' + ' 반환 인자 중 일부가 docstring에 기재되어 있지 않습니다.')
+                print(set(result.result_variables.keys()).difference(set(docstring_return_params)))
+                print('\033[91m' + '위 인자의 변수명이 docstring에 기록되어 있는지, 변수명에 오류가 없는지 확인 바랍니다.' + '\033[0m')
