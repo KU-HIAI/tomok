@@ -9,8 +9,8 @@ class OKNGResult(IntEnum):
 
 
 class StatusCode(IntEnum):
-    PASS = 200
-    FAIL = 500
+    OK = 200
+    ERROR_0 = 400
 
 
 @dataclass
@@ -22,7 +22,9 @@ class ResultBase:
 
 
 class PassFailResult(ResultBase):
-    def __init__(self, pass_fail: bool, code: StatusCode, result_text: str = "ok"):
+    def __init__(
+        self, pass_fail: bool, code: StatusCode = StatusCode.OK, result_text: str = "ok"
+    ):
         super().__init__(
             code=code,
             result_text=result_text,
@@ -32,13 +34,33 @@ class PassFailResult(ResultBase):
 
 class SingleValueResult(ResultBase):
     def __init__(
-        self, var_name: str, var_value: str, code: StatusCode, result_text="ok"
+        self,
+        var_name: str,
+        var_value: object,
+        code: StatusCode = StatusCode.OK,
+        result_text="ok",
     ):
         assert isinstance(var_name, str), "변수명 타입이 str 이 아닙니다."
         super().__init__(code, result_text, {var_name: var_value})
 
 
 class MultiValueResult(ResultBase):
-    def __init__(self, result_variables: dict, code: StatusCode, text: str = "ok"):
-        assert all(isinstance(k, str) for k in result_variables)
-        super().__init__(code, text, result_variables)
+    def __init__(
+        self,
+        result_variables: dict,
+        code: StatusCode = StatusCode.OK,
+        result_text: str = "ok",
+    ):
+        assert all(isinstance(k, str) for k in result_variables), "변수명 타입이 str 이 아닙니다."
+        super().__init__(code, result_text, result_variables)
+
+
+class RuleUnitResult(ResultBase):
+    def __init__(
+        self,
+        result_variables: dict,
+        code: StatusCode = StatusCode.OK,
+        result_text: str = "ok",
+    ):
+        assert all(isinstance(k, str) for k in result_variables), "변수명 타입이 str 이 아닙니다."
+        super().__init__(code, result_text, result_variables)
