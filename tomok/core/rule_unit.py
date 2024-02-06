@@ -264,7 +264,7 @@ class RuleUnit:
             else:
                 # print('\033[91m' + '[오류]' + '\033[0m' + ' 반환 자료는 ResultBase, PassFailResult, SingleValueResult, MultiValueResult 등 이어야 합니다.')
                 print(
-                    "\033[91m" + "[오류]" + "\033[0m" + " 반환 자료는 RuleUnitResult 이어야 합니다."
+                    "\033[91m" + "[오류]" + "\033[0m" + " 반환 자료형은 RuleUnitResult 이어야 합니다."
                 )
                 return
             if len(set(result.result_variables.keys()).difference(set(docstring_return_params))) > 0:
