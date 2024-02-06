@@ -1,16 +1,21 @@
 import sys
 import os
 
+# 현재 파일의 디렉토리 경로를 얻습니다.
 current_dir = os.path.dirname(__file__)
+# 상위 디렉토리 경로를 얻습니다.
 parent_dir = os.path.dirname(current_dir)
+# 상위 디렉토리 경로를 sys.path에 추가합니다.
 sys.path.append(parent_dir)
 
+# 이제 module1.file1을 import 할 수 있습니다.
 from tomok.core.rule_unit import RuleUnit
 from tomok.core.decorator import rule_method
 
 import math
 from typing import List
 
+# 작성하는 룰에 맞게 클래스 이름 수정 (KDS142054_040305_05)
 class KDS142054_040305_05 (RuleUnit):
 
     # 아래 클래스 멤버 변수에 할당되는 값들을 작성하는 룰에 맞게 수정
@@ -33,6 +38,15 @@ class KDS142054_040305_05 (RuleUnit):
     # 이미지 링크 변환 사이트 https://www.somanet.xyz/2017/06/blog-post_21.html
     # 건설기준문서내용(text)
     content = """
+    ####   4.3.5 인장력을 받는 부착식 앵커의 부착강도
+    (5) 쪼개짐을 제어하기 위한 보조철근을 사용하지 않는 비균열 콘크리트에 사용되는 부착식 앵커의 수정계수 $$\psi _{cp,Na}$$는 다음과 같이 구하여야 한다.
+    $$c_{a,min}\geq c_{ac}$$인 경우
+
+		      $$\psi _{cp,Na}=1.0$$     (4.3-26)
+
+    $$c_{a,min}<c_{ac}$$인 경우
+
+		      $$\psi _{cp,Na}=\frac{c_{a,min}}{c_{ac}}$$      (4.3-27)
     """
 
     # 플로우차트(mermaid)
@@ -77,9 +91,18 @@ class KDS142054_040305_05 (RuleUnit):
 
         if fIcamin >= fIcac:
           fOpscpNa = 1.0
+
         else:
           fOpscpNa = fIcamin / fIcac
 
         return fOpscpNa
 
 
+# ruleunit = KDS142054_040305_05()
+# fOpscpNa = None
+# fIcamin = 100
+# fIcac = 90
+# Rule_Review_Result = ruleunit.modification_factors_for_bonded_anchors_used_in_uncracked_concrete(fOpscpNa,fIcamin,fIcac)
+# # 해당건설기준 항목 의 결과는?
+
+# print("RuleUnit Review Result: {}".format(Rule_Review_Result))
