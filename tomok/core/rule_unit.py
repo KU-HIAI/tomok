@@ -151,11 +151,20 @@ class RuleUnit:
         return extractor.names
 
     def wrap_value(self, type_str, value):
+        def parse_bool(s):
+            s = s.strip().lower()
+            if s == 'true':
+                return True
+            elif s == 'false':
+                return False
+            else:
+                raise ValueError("bool 타입 변수에는 True 또는 False를 입력해야 합니다.")
+
         type_dict = {
             "int": int,
             "float": float,
             "str": str,
-            "bool": bool,
+            "bool": parse_bool,  # since bool('False') is True
             "list": list,
             "tuple": tuple,
             "dict": dict,
