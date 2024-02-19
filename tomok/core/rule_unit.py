@@ -1,4 +1,5 @@
 from typing import Optional
+from itertools import product
 import inspect
 import requests
 import json
@@ -168,11 +169,20 @@ class RuleUnit:
         return extractor.names
 
     def wrap_value(self, type_str, value):
+        def parse_bool(s):
+            s = s.strip().lower()
+            if s == 'true':
+                return True
+            elif s == 'false':
+                return False
+            else:
+                raise ValueError("bool 타입 변수에는 True 또는 False를 입력해야 합니다.")
+
         type_dict = {
             "int": int,
             "float": float,
             "str": str,
-            "bool": bool,
+            "bool": parse_bool,  # since bool('False') is True
             "list": list,
             "tuple": tuple,
             "dict": dict,
@@ -219,7 +229,8 @@ class RuleUnit:
             if is_variables_matched:
                 print("\033[92m" + "[통과]" + "\033[0m" + " 함수와 docstring 인자 일치")
             else:
-                print("\033[91m" + "[오류]" + "\033[0m" + " 함수와 docstring 인자 불일치")
+                print("\033[91m" + "[오류]" + "\033[0m" + " 함수와 docstring 인자 불일치.\n")
+                print("맞는데도 이 오류가 발생한다면 docstring의 띄어쓰기를 확인하세요.")
 
             # 입력 인자에 userdefined 있는지 여부
             has_userdefined = False
@@ -254,7 +265,7 @@ class RuleUnit:
                 return
             user_input = {}
             for param in input_list:
-                user_input[param] = input(f"{param} 인자의 값을 넣어주세요 : ")
+                user_input[param] = input(f"{param} ({docstring_params[param]}) 인자의 값을 넣어주세요 : ")
                 try:
                     user_input[param] = self.wrap_value(
                         docstring_params[param], user_input[param]
@@ -281,10 +292,40 @@ class RuleUnit:
             else:
                 # print('\033[91m' + '[오류]' + '\033[0m' + ' 반환 자료는 ResultBase, PassFailResult, SingleValueResult, MultiValueResult 등 이어야 합니다.')
                 print(
-                    "\033[91m" + "[오류]" + "\033[0m" + " 반환 자료는 RuleUnitResult 이어야 합니다."
+                    "\033[91m" + "[오류]" + "\033[0m" + " 반환 자료형은 RuleUnitResult 이어야 합니다."
                 )
                 return
             if len(set(result.result_variables.keys()).difference(set(docstring_return_params))) > 0:
                 print('\033[91m' + '[오류]' + '\033[0m' + ' 반환 인자 중 일부가 docstring에 기재되어 있지 않습니다.')
                 print(set(result.result_variables.keys()).difference(set(docstring_return_params)))
                 print('\033[91m' + '위 인자의 변수명이 docstring에 기록되어 있는지, 변수명에 오류가 없는지 확인 바랍니다.' + '\033[0m')
+            print("")
+
+            # 경곗값 테스트 (Boundary Value Test) - 입력변수에 극단적인 값이 들어와도 안전한지 검증
+            print("\033[1m[다양한 입력값 대응 여부 검증]\033[0m")
+            value_dict = {  # 임의로 설정한 극단적 값
+                "int": [-1, 0, 10, 100, 99999],
+                "float": [-1.0, 0.0, 10.0, 100.0, 99999.9],
+                "str": ['', '테스트', 'Test!Test!Test!Test!Test!Test!\nTest!'],
+                "bool": [True, False],
+                "list": [[1.0], [1.0, 999.9]],
+                "dict": [{"1": 1}],
+                "set": [{1.0}, {1.0, 999.9}],
+            }
+            arg_to_type = {k: docstring_params[k] for k in input_list}
+            candidates = [value_dict[v] for v in arg_to_type.values()]
+
+            for extreme_args in product(*candidates):
+                try:
+                    output = func(*extreme_args)
+                    if not isinstance(output, ResultBase):
+                        print("\033[91m" + "[오류]" + "\033[0m" + " RuleUnitResult를 반환하지 않는 경우 존재")
+                        raise TypeError("RuleUnit 반환형 오류")
+                except AssertionError:
+                    pass  # no problem with AssertionError when given extreme arguments
+                except TypeError:
+                    # print("\033[91m" + "[오류]" + "\033[0m" + " 룰 안전하지 않음")
+                    print('\033[1m' + f"오류 당시 입력변수" + '\033[0m' + f": {str({k:v for k, v in zip(input_list, extreme_args)})}")
+                    raise
+            print("\033[92m" + "[통과]" + "\033[0m" + " 극단적 입력값 테스트 완료")
+
