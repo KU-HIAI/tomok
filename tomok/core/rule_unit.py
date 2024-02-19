@@ -1,5 +1,5 @@
 from typing import Optional
-from itertools import product
+from itertools import product, islice
 import inspect
 import requests
 import json
@@ -8,6 +8,7 @@ import zlib
 import re
 import ast
 import textwrap
+import random
 from .util import typename, import_check
 from .results import ResultBase
 
@@ -336,7 +337,7 @@ class RuleUnit:
             arg_to_type = {k: docstring_params[k] for k in input_list}
             candidates = [value_dict[v] for v in arg_to_type.values()]
 
-            for extreme_args in product(*candidates):
+            for extreme_args in islice(product(*candidates), 10000):  # 나중에 product의 순서가 랜덤으로 되도록 해야 함
                 try:
                     output = func(*extreme_args)
 
