@@ -191,7 +191,9 @@ class RuleUnit:
         }
         return type_dict[type_str](value)
 
-    def verify(self):
+    def verify(self, with_stdin=True):
+        error_flag = 0  # 하나라도 오류가 있으면 1를 반환
+
         # 메타 데이터 검증
         print("\033[1m[메타 데이터 검증]\033[0m")
         print("acc_able: ", self.acc_able)
@@ -204,6 +206,7 @@ class RuleUnit:
                 + "\033[0m"
                 + " 메타데이터에 acc_able (ACC 가능여부)가 설정되어야 합니다. ACC 가능일 경우 True 아닌 경우 False 값을 설정해야 합니다."
             )
+            error_flag = 1
         print("")
 
         print("\033[1m[룰 유닛 함수 목록]\033[0m")
@@ -231,6 +234,7 @@ class RuleUnit:
             else:
                 print("\033[91m" + "[오류]" + "\033[0m" + " 함수와 docstring 인자 불일치.\n")
                 print("맞는데도 이 오류가 발생한다면 docstring의 띄어쓰기를 확인하세요.")
+                error_flag = 1
 
             # 입력 인자에 userdefined 있는지 여부
             has_userdefined = False
@@ -241,6 +245,7 @@ class RuleUnit:
                 print("\033[92m" + "[통과]" + "\033[0m" + " UserDefined 인자 불검출")
             else:
                 print("\033[91m" + "[오류]" + "\033[0m" + " UserDefined 인자 검출")
+                error_flag = 1
 
             # 모든 입력 인자의 사용 여부 검사
             source_vars = self._get_source_vars(source)
@@ -254,6 +259,7 @@ class RuleUnit:
                     "\033[91m" + "[미사용 인자]" + "\033[0m",
                     set(input_list).difference(set(source_vars)),
                 )
+                error_flag = 1
             print("")
 
             # 룰 실행여부 검증
@@ -262,44 +268,59 @@ class RuleUnit:
                 print('\033[91m' + '[오류]' + '\033[0m' + ' 입력 인자 중 일부가 docstring에 기재되어 있지 않습니다. 자료형(예: float, str, int)을 알 수 없으므로 룰 실행 여부 검정이 불가합니다.')
                 print(set(input_list).difference(set(docstring_params.keys())))
                 print('\033[91m' + '위 인자에 대한 docstring 작성 후 다시 실행 해주시기 바랍니다.' + '\033[0m')
-                return
-            user_input = {}
-            for param in input_list:
-                user_input[param] = input(f"{param} ({docstring_params[param]}) 인자의 값을 넣어주세요 : ")
+                return 1
+            if with_stdin:  # input()의 stdin 입력 없이 검토하는 기능 추가
+                user_input = {}
+                for param in input_list:
+                    user_input[param] = input(f"{param} ({docstring_params[param]}) 인자의 값을 넣어주세요 : ")
+                    try:
+                        user_input[param] = self.wrap_value(
+                            docstring_params[param], user_input[param]
+                        )
+                        print(f"{param}: {user_input[param]}")
+                    except Exception as ex:
+                        print("\033[91m" + "[오류]" + "\033[0m" + " 인자 형 변환 실패")
+                        print(ex)
+                        error_flag = 1
                 try:
-                    user_input[param] = self.wrap_value(
-                        docstring_params[param], user_input[param]
-                    )
-                    print(f"{param}: {user_input[param]}")
+                    result = func(**user_input)
+                    print("\033[92m" + "[통과]" + "\033[0m" + " 룰 실행 확인")
                 except Exception as ex:
-                    print("\033[91m" + "[오류]" + "\033[0m" + " 인자 형 변환 실패")
+                    print("\033[91m" + "[오류]" + "\033[0m" + " 룰 실행 실패")
                     print(ex)
-            try:
-                result = func(**user_input)
-                print("\033[92m" + "[통과]" + "\033[0m" + " 룰 실행 확인")
-            except Exception as ex:
-                print("\033[91m" + "[오류]" + "\033[0m" + " 룰 실행 실패")
-                print(ex)
+                    error_flag = 1
+
+                # 룰 반환형 검사
+                print("\033[1m[룰 반환 데이터 검증]\033[0m")
+                print("결과:", result)
+                if isinstance(result, ResultBase):
+                    print("\033[92m" + "[통과]" + "\033[0m" + " 반환 자료형 확인")
+                else:
+                    # print('\033[91m' + '[오류]' + '\033[0m' + ' 반환 자료는 ResultBase, PassFailResult, SingleValueResult, MultiValueResult 등 이어야 합니다.')
+                    print(
+                        "\033[91m" + "[오류]" + "\033[0m" + " 반환 자료형은 RuleUnitResult 이어야 합니다."
+                    )
+                    return 1
+            else:
+                print("건너뜁니다... (입력값 없이 진행)")
             print("")
 
-            # 룰 반환형 검사
-            print("\033[1m[룰 반환 데이터 검증]\033[0m")
             docstring_return_params = self._find_return_docstring_variables(func)
             docstring_return_params = {var[0]: var[1] for var in docstring_return_params}
-            print("결과:", result)
-            if isinstance(result, ResultBase):
-                print("\033[92m" + "[통과]" + "\033[0m" + " 반환 자료형 확인")
-            else:
-                # print('\033[91m' + '[오류]' + '\033[0m' + ' 반환 자료는 ResultBase, PassFailResult, SingleValueResult, MultiValueResult 등 이어야 합니다.')
-                print(
-                    "\033[91m" + "[오류]" + "\033[0m" + " 반환 자료형은 RuleUnitResult 이어야 합니다."
-                )
-                return
-            if len(set(result.result_variables.keys()).difference(set(docstring_return_params))) > 0:
-                print('\033[91m' + '[오류]' + '\033[0m' + ' 반환 인자 중 일부가 docstring에 기재되어 있지 않습니다.')
-                print(set(result.result_variables.keys()).difference(set(docstring_return_params)))
-                print('\033[91m' + '위 인자의 변수명이 docstring에 기록되어 있는지, 변수명에 오류가 없는지 확인 바랍니다.' + '\033[0m')
-            print("")
+
+            def validate_return_docstring(returned_value):
+                if len(set(returned_value.result_variables.keys()).difference(set(docstring_return_params))) > 0:
+                    print('\033[91m' + '[오류]' + '\033[0m' + ' 반환 인자 중 일부가 docstring에 기재되어 있지 않습니다.')
+                    print(set(returned_value.result_variables.keys()).difference(set(docstring_return_params)))
+                    print('\033[91m' + '위 인자의 변수명이 docstring에 기록되어 있는지, 변수명에 오류가 없는지 확인 바랍니다.' + '\033[0m')
+                    print("")
+                    return 1
+                else:
+                    return 0
+
+            if with_stdin:
+                if validate_return_docstring(result) == 1:
+                    error_flag = 1
 
             # 경곗값 테스트 (Boundary Value Test) - 입력변수에 극단적인 값이 들어와도 안전한지 검증
             print("\033[1m[다양한 입력값 대응 여부 검증]\033[0m")
@@ -318,9 +339,16 @@ class RuleUnit:
             for extreme_args in product(*candidates):
                 try:
                     output = func(*extreme_args)
+
+                    # docstring 검사
+                    if validate_return_docstring(output) == 1:
+                        raise TypeError
+
+                    # return type 검사
                     if not isinstance(output, ResultBase):
                         print("\033[91m" + "[오류]" + "\033[0m" + " RuleUnitResult를 반환하지 않는 경우 존재")
                         raise TypeError("RuleUnit 반환형 오류")
+
                 except AssertionError:
                     pass  # no problem with AssertionError when given extreme arguments
                 except TypeError:
@@ -328,4 +356,6 @@ class RuleUnit:
                     print('\033[1m' + f"오류 당시 입력변수" + '\033[0m' + f": {str({k:v for k, v in zip(input_list, extreme_args)})}")
                     raise
             print("\033[92m" + "[통과]" + "\033[0m" + " 극단적 입력값 테스트 완료")
+
+        return error_flag
 
