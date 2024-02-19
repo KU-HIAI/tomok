@@ -64,17 +64,21 @@ class RuleUnit:
 
         display(Markdown(f"![]({img_url})"))
 
-    def save_flowchart(self, filename=None, saved_directory=None):
+    def _get_filename(self, filename=None, saved_directory=None, extension='png'):
         # 파일 이름이 제공되지 않은 경우, 클래스 이름과 '.png' 확장자를 사용합니다.
         if not filename:
             class_name = self.__class__.__name__
             if class_name == "__main__":
                 class_name = "saved_image"
-            filename = f"{class_name}.png"
+            filename = f"{class_name}.{extension}"
         if saved_directory is not None:
             import os
 
             filename = os.path.join(saved_directory, filename)
+        return filename
+
+    def save_flowchart(self, filename=None, saved_directory=None):
+        filename = self._get_filename(filename, saved_directory, 'png')
 
         response = requests.get(self._get_mermaid_ink_url(self.flowchart))
         if response.status_code == 200:
@@ -84,12 +88,25 @@ class RuleUnit:
         else:
             print("이미지를 다운로드할 수 없습니다.")
 
-    def render_markdown(self):
+    def render_content(self):
         if not import_check("IPython"):
             return
         from IPython.display import display, Markdown
 
         display(Markdown(self.content))
+    
+    def save_content_md(self, filename=None, saved_directory=None):
+        filename = self._get_filename(filename, saved_directory, 'md')
+        with open(filename, "w") as file:
+            file.write(self.content)
+            print(f"건설기준문서내용이 {filename}으로 저장되었습니다.")
+    
+    def save_content_html(self, filename=None, saved_directory=None):
+        filename = self._get_filename(filename, saved_directory, 'html')
+        from markdown import markdown
+        with open(filename, "w") as file:
+            file.write(markdown(self.content))
+            print(f"건설기준문서내용이 {filename}으로 저장되었습니다.")
 
     def _find_docstring_variables(self, func):
         """Find variables in the given function's docstring."""
