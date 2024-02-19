@@ -91,3 +91,22 @@ def verify(user, *args, **kwargs) -> Dict:
         'detail': 'ok',
         'status': 200
     }
+
+
+def verify_all(user, *args, **kwargs) -> Dict:
+    crypt = CRYPT.get()
+    ric = RIC.get()
+
+    token = kwargs['body']['ifctoken']
+    guid = kwargs['body']['guid']
+
+    filepath = to_absolute_path(ifc_path + token)
+    reader = IFCReader(filepath)
+
+    results, results_str = ric.verify_all(reader, guid, return_results=True)
+
+    return {
+        'results': [result.to_json() for result in results],
+        'detail': 'ok',
+        'status': 200
+    }
