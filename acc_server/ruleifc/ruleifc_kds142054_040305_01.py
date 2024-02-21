@@ -20,7 +20,7 @@ class RuleIFC_KDS142054_01(RuleIFC):
     log = []
     init_log = []
 
-    def ruleunit_call(self, uri, key='f234cf784e7c9669929122343a808bcf9607e425', base_uri='http://localhost:51032/v1.0/', *args, **kwargs):
+    def ruleunit_call(self, uri, key='f234cf784e7c9669929122343a808bcf9607e425', base_uri='http://tomokapi.hiai.kr/v1.0/', *args, **kwargs):
         headers = {'X-Auth': key}
         api_uri = base_uri + uri
         print(api_uri)
