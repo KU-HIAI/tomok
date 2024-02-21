@@ -12,10 +12,6 @@ from .type_conv import ifc_single_value_to_python, python_to_ifc_single_value, _
 class PropertySet():
     _STAGE = ['init', 'writable', 'freeze']
     _state = _STAGE.index('init')
-    _protected_keys = []
-    property_names = []
-    descriptions = {}
-    _name_types = {}
 
     def __init__(
         self,
@@ -26,6 +22,12 @@ class PropertySet():
         self.ifc = ifc
         self.entity = entity
         self.access = access
+
+        self._state = self._STAGE.index('init')
+        self._protected_keys = []
+        self.property_names = []
+        self.descriptions = {}
+        self._name_types = {}
 
         self._protected_keys = [k for k in vars(
             self).keys()] + [k for k in vars(type(self)).keys()]
@@ -83,12 +85,12 @@ class PropertySet():
         if self.entity.__getattr__(self.access) is None:
             self.property_names = []
         else:
-            self.property_names = [prop.Name for prop in self._get_props()] + [prop.Specification for prop in self._get_props()]
+            self.property_names = [prop.Name for prop in self._get_props()] + [prop.Specification for prop in self._get_props() if hasattr(prop, 'Specification')]
             self.descriptions = {
                 prop.Name: prop.Description for prop in self._get_props() if hasattr(prop, 'Description')
             }
             self.descriptions.update({
-                prop.Specification: prop.Description for prop in self._get_props() if hasattr(prop, 'Description')
+                prop.Specification: prop.Description for prop in self._get_props() if hasattr(prop, 'Description') and hasattr(prop, 'Specification')
             })
 
     def _parse_property_values(
@@ -97,7 +99,7 @@ class PropertySet():
         if self.entity.__getattr__(self.access) is None:
             return
         for prop in self._get_props():
-            if prop.NominalValue is not None:
+            if hasattr(prop, 'NominalValue') and prop.NominalValue is not None:
                 value_type = prop.NominalValue.get_info()['type']
                 wrapped_value = prop.NominalValue.wrappedValue
                 value = ifc_single_value_to_python(value_type, wrapped_value, prop)
@@ -105,7 +107,7 @@ class PropertySet():
                 value = None
             self.__setattr__(prop.Name, value)
             self._name_types[prop.Name] = 'name'
-            if prop.Specification is not None:
+            if hasattr(prop, 'Specification') and prop.Specification is not None:
                 self.__setattr__(prop.Specification, value)
                 self._name_types[prop.Name] = 'specification'
 
@@ -167,6 +169,24 @@ class PropertySet():
             'descriptions': self.descriptions[pname] if pname in self.descriptions.keys() else None
         }
             for pname in self.property_names}
+    
+    def get_properties_by_name(
+        self
+    ):
+        return {pname: {
+            'value': self.__getattribute__(pname),
+            'descriptions': self.descriptions[pname] if pname in self.descriptions.keys() else None
+        }
+            for pname in self.property_names if self._name_types[pname] == 'name'}
+    
+    def get_properties_by_specification(
+        self
+    ):
+        return {pname: {
+            'value': self.__getattribute__(pname),
+            'descriptions': self.descriptions[pname] if pname in self.descriptions.keys() else None
+        }
+            for pname in self.property_names if self._name_types[pname] == 'specification'}
 
     def has_property(
         self,
