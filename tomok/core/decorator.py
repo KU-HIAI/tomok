@@ -12,6 +12,9 @@ def rule_method(fn):
             self.fn = fn
         
         def __call__(self, *args, **kwargs):
+            if 'body' in kwargs:
+                result = self.fn(**kwargs['body'])
+                return result.result_variables
             return self.fn(*args, **kwargs)
     
     return RuleMethod(fn)

@@ -1,0 +1,16 @@
+_target_: server.connexion_aiohttp.ConnexionAioHttpApp
+
+# app server network
+app_host: '0.0.0.0'
+app_port: 51032
+
+# api
+specification_dir: openapi
+api_files: ['tomok-api.yaml']
+api_secret: 'kDiWQ_idJ8NCKy_sD3p_0hA5ifoewFJRa0WzfzxRVhc='
+client_max_size: 524288000 # 500MB
+rule_unit_dir: '../ruleunits/'
+rule_ifc_dir: '../ruleifc/'
+
+# process
+process_title: 'TOMOK API (DEV)'
