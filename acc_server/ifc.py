@@ -21,7 +21,6 @@ logger = logging.getLogger(__name__)
 ifc_path = 'uploads/'
 os.makedirs(ifc_path, exist_ok=True)
 CRYPT = ContextVar('crypt', default=None)
-RUC = ContextVar('RuleUnitController', default=None)
 RIC = ContextVar('RuleIFCController', default=None)
 
 
@@ -29,12 +28,8 @@ def ifc_init(app):
     config = app['config']
     crypt = Crypt(config.server.api_secret)
     CRYPT.set(crypt)
-    rule_unit_relpath = os.path.relpath(to_absolute_path(config.server.rule_unit_dir), os.getcwd())
-    print(rule_unit_relpath)
     rule_ifc_relpath = os.path.relpath(to_absolute_path(config.server.rule_ifc_dir), os.getcwd())
-    ruc = RuleUnitController(rule_unit_relpath)
-    ric = RuleIFCController(rule_ifc_relpath, ruc, 'local')
-    RUC.set(ruc)
+    ric = RuleIFCController(rule_ifc_relpath, None, 'local')
     RIC.set(ric)
 
 
