@@ -10,14 +10,12 @@ from omegaconf import DictConfig
 
 # framework
 from utils import print_config
-from ifc import ifc_init
 
 
 def launch_server(config):
     server = hydra.utils.instantiate(config.server)
     app = server.app
     app.app['config'] = config
-    ifc_init(app.app)
     app.run(port=config.server.app_port)
 
 
