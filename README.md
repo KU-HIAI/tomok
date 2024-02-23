@@ -27,10 +27,14 @@
     pip install .
     ```
 
-### 내부 API 서버
+### ACC 내부 서버
 
-/server/README.md 참조
+/acc_server/README.md 참조
 
+### API 서버
 
-## TODO
-.ipynb -> .py 기계적 변환 프로세스 구축
+/api_server/README.md 참조
+
+### 확장 IFC 룰 유닛 다운로더
+
+`streamlit run ifc_explorer.py --server.port=51037 --server.maxUploadSize=1000`
