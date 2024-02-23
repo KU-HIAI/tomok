@@ -60,6 +60,8 @@ def main():
 """)
 
     uploaded_file = st.file_uploader("확장 IFC 파일 업로드", type='ifc')
+    st.markdown("예시 파일 [다운로드](https://drive.google.com/file/d/1WBy_qUhjumZCoHjpGsJRdQyayZ2UGq5v/view?usp=sharing)")
+    
     if uploaded_file:
         with st.spinner('IFC 파일 분석중 입니다...'):
             ruc = RuleUnitController('./api_server/ruleunits')
