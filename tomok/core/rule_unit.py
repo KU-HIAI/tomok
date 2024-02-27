@@ -179,12 +179,22 @@ class RuleUnit:
             else:
                 raise ValueError("bool 타입 변수에는 True 또는 False를 입력해야 합니다.")
 
+        def parse_list(s):
+            if isinstance(s, list):
+                return s
+            elif isinstance(s, str):
+                s = s.strip()
+                assert re.fullmatch(r"\[\d+(\.\d+)?(,\s?\d+(\.\d+)?)*]", s), "[1, 2, 3]과 같은 식으로 입력해야 합니다."
+                return list(map(float, s[1:-1].split(',')))
+            else:
+                raise ValueError("list 형식으로 파싱할 수 없습니다.")
+
         type_dict = {
             "int": int,
             "float": float,
             "str": str,
             "bool": parse_bool,  # since bool('False') is True
-            "list": list,
+            "list": parse_list,
             "tuple": tuple,
             "dict": dict,
             "set": set,
@@ -330,13 +340,16 @@ class RuleUnit:
                 "float": [-1.0, 0.0, 10.0, 100.0, 99999.9],
                 "str": ['', '테스트', 'Test!Test!Test!Test!Test!Test!\nTest!'],
                 "bool": [True, False],
-                "list": [[1.0], [1.0, 999.9]],
+                "list": [[-1.0], [0.0, 999.9], [0.0]],
                 "dict": [{"1": 1}],
                 "set": [{1.0}, {1.0, 999.9}],
             }
             arg_to_type = {k: docstring_params[k] for k in input_list}
-            candidates = [value_dict[v] for v in arg_to_type.values()]
-
+            try:  # 오류메시지를 구체적으로 출력
+                candidates = [value_dict[v] for v in arg_to_type.values()]
+            except KeyError:
+                print("\033[91m" + "[오류]" + "\033[0m" + " docstring의 변수 type이 정확하게 적혀 있는지 확인해주세요")
+                raise
             for extreme_args in islice(product(*candidates), 10000):  # 나중에 product의 순서가 랜덤으로 되도록 해야 함
                 try:
                     output = func(*extreme_args)
