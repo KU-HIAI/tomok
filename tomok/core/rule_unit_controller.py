@@ -42,6 +42,7 @@ class RuleUnitController():
                                     import_name = os.path.join(relative_path, filename).lstrip('./').replace(os.path.sep, '.')[:-3]
                                     ruleunit = getattr(import_module(import_name), cls_name)()
                                     ruleunit.filename = filename
+                                    ruleunit.filepath = os.path.join(curpath, filename)
                                     self.ruleunits.append(ruleunit)
 
                                     # Adding object to ruleunits_dict

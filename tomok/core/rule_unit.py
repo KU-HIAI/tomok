@@ -44,10 +44,10 @@ class RuleUnit:
         ]
         return method_list
 
-    def _get_mermaid_ink_url(self, flowchart_str, theme="default"):
+    def _get_mermaid_ink_url(self, flowchart_str, theme="default", bgColor='!white'):
         json_obj = {"code": flowchart_str, "mermaid": {"theme": theme}}
         pako_str = self._encode_pako(json_obj)
-        url = f"https://mermaid.ink/img/pako:{pako_str}"
+        url = f"https://mermaid.ink/img/pako:{pako_str}?bgColor={bgColor}"
         return url
 
     def _encode_pako(self, json_obj):

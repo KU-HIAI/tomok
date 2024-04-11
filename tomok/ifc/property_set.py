@@ -82,6 +82,7 @@ class PropertySet():
     def _parse_property_names(
         self
     ):
+        # print(self.entity)
         if self.entity.__getattr__(self.access) is None:
             self.property_names = []
         else:
@@ -168,7 +169,7 @@ class PropertySet():
             'value': self.__getattribute__(pname),
             'descriptions': self.descriptions[pname] if pname in self.descriptions.keys() else None
         }
-            for pname in self.property_names}
+            for pname in self.property_names if pname is not None}
     
     def get_properties_by_name(
         self

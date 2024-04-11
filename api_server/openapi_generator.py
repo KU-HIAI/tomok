@@ -27,7 +27,7 @@ def _find_docstring_variables(func):
     # Define regex patterns for args and variable names/descriptions
     arg_pattern = re.compile(r"Args:\n(.+?)(\n\n|$)", re.S)
     return_pattern = re.compile(r"Returns:\n(.+?)(\n\n|$)", re.S)
-    var_pattern = re.compile(r"(\w+)\s\(([\w.]+)\):(.+)")
+    var_pattern = re.compile(r"(\w+)\s\(([\w.\[\]]+)\):(.+)")
 
     arg_block_match = arg_pattern.search(docstring)
     return_block_match = return_pattern.search(docstring)
@@ -74,18 +74,19 @@ for std in dict_generator(ruc.ruleunits_dict):
         'str': 'string',
         'bool': 'boolean',
         'string': 'string',
-        'sting': 'string'
+        'sting': 'string',
+        'List[float]': 'array'
+    }
+    type_items = {
+        'List[float]': {'type': 'number'}
     }
     for arg in args:
         args_dict[arg[0]] = {
             'type': type_conv[arg[1]],
             'description': arg[2]
         }
-    for arg in return_args:
-        return_args_dict[arg[0]] = {
-            'type': type_conv[arg[1]],
-            'description': arg[2]
-        }
+        if arg[1] in type_items:
+            args_dict[arg[0]]['items'] = type_items[arg[1]]
     # print(std)
     docstr = inspect.getdoc(std[-1].rule_methods[0].fn)
     markdown = std[-1].content

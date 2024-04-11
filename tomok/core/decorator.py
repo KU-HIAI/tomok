@@ -1,3 +1,4 @@
+import traceback
 # python
 
 def rule_method(fn):
@@ -13,7 +14,18 @@ def rule_method(fn):
         
         def __call__(self, *args, **kwargs):
             if 'body' in kwargs:
-                result = self.fn(**kwargs['body'])
+                try:
+                    result = self.fn(**kwargs['body'])
+                except Exception as ex:
+                    response = {
+                        'success': False,
+                        'error': {
+                            'type': type(ex).__name__,  # exception class name
+                            'message': str(ex),  # exception message
+                        }
+                    }
+
+                    return response, 500
                 return result.result_variables
             return self.fn(*args, **kwargs)
     
