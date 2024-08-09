@@ -15,12 +15,11 @@ from .util import get_ifc_property_set_from_entity, CaseInsensitiveDefaultDict
 
 
 class IFCReader():
-    easy_products_cache = {} 
-    guid_product_cache = {}
-    subtype_product_cache = CaseInsensitiveDefaultDict(list)
-
     def __init__(self,
                  ifc_filepath: str):
+        self.easy_products_cache = {}
+        self.guid_product_cache = {}
+        self.subtype_product_cache = CaseInsensitiveDefaultDict(list)
         # ifcopenshell C language escape character error fix
         self.fix_escape_char_error(ifc_filepath)
         self.ifc = ifcopenshell.open(ifc_filepath)
