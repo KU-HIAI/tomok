@@ -86,7 +86,7 @@ class PropertySet():
         if self.entity.__getattr__(self.access) is None:
             self.property_names = []
         else:
-            self.property_names = [prop.Name for prop in self._get_props()] + [prop.Specification for prop in self._get_props() if hasattr(prop, 'Specification')]
+            self.property_names = [prop.Name for prop in self._get_props() if prop.Name is not None] + [prop.Specification for prop in self._get_props() if hasattr(prop, 'Specification') and prop.Specification is not None]
             self.descriptions = {
                 prop.Name: prop.Description for prop in self._get_props() if hasattr(prop, 'Description')
             }
@@ -104,6 +104,14 @@ class PropertySet():
                 value_type = prop.NominalValue.get_info()['type']
                 wrapped_value = prop.NominalValue.wrappedValue
                 value = ifc_single_value_to_python(value_type, wrapped_value, prop)
+            elif hasattr(prop, 'ListValues') and prop.ListValues is not None:
+                list_values = []
+                for nominal_value in prop.ListValues:
+                    value_type = nominal_value.get_info()['type']
+                    wrapped_value = nominal_value.wrappedValue
+                    value = ifc_single_value_to_python(value_type, wrapped_value, prop)
+                    list_values.append(value)
+                value = list_values
             else:
                 value = None
             self.__setattr__(prop.Name, value)
