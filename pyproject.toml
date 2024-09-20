@@ -9,6 +9,7 @@ readme = "README.md"
 python = ">=3.9,<4.0"
 ipykernel = "^6.23.3"
 mistune = "^3.0.1"
+ifcopenshell = "^0.8.0"
 
 
 [build-system]
