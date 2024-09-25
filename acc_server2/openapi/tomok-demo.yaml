@@ -177,6 +177,7 @@ paths:
                 subtype:
                   type: string
                   description: "부재 Subtype"
+                  default: RC_STIFFENINGGIRDER
       security:
         - api_key: []
 components:

@@ -7,36 +7,69 @@ from collections import defaultdict, deque
 import pandas as pd
 from typing import List, Dict, Any
 
-# from acc_utils import ACCEngine, RuleUnitCallingDescriptor
 from ..ifc import IFCReader
 
 
 class RuleUnitCallingDescriptor:
-    def __init__(self, rule_file, module_file):
+    def __init__(self, rule_file, module_files):
         self.df = pd.read_csv(rule_file, index_col=False).drop_duplicates()
-        self.module_df = pd.read_csv(
-            module_file, index_col=False
-        ).drop_duplicates()  # module csv 에서 가져옴. 라이브러리에서 가져오면 정보 더 많을 것. 이후 수정 필요
-        self.module_df["code"] = self.module_df["code"].apply(self.convert_code_format)
-        self.graph, self.reverse_graph = self.build_graph(self.df)
-        self.sccs = self.tarjan_scc(self.graph)
-        print("SCCs found:", self.sccs)
-        self.dag, self.scc_map = self.build_scc_dag(self.sccs, self.graph)
-        self.topo_order = self.topological_sort(self.dag)
-        self.execution_orders = self.get_execution_orders()
+        self.module_dfs = [
+            pd.read_csv(module_file, index_col=False).drop_duplicates()
+            for module_file in module_files
+        ]
+        self.results = []
+        for module_df in self.module_dfs:
+            module_df["code"] = module_df["code"].apply(self.convert_code_format)
+            graph, reverse_graph = self.build_graph(self.df, module_df)
+            sccs = self.tarjan_scc(graph)
+
+            # 모든 노드가 연결된 경우, 실행 순서에 포함되도록 처리
+            if len(sccs) != len(module_df):
+                sccs = self.ensure_all_nodes_in_scc(sccs, graph)
+
+            print("SCCs found:", sccs)
+            dag, scc_map = self.build_scc_dag(sccs, graph)
+            topo_order = self.topological_sort(dag)
+            execution_orders = self.get_execution_orders(module_df, topo_order, sccs)
+            self.results.append(
+                {
+                    "module_df": module_df,
+                    "graph": graph,
+                    "reverse_graph": reverse_graph,
+                    "sccs": sccs,
+                    "dag": dag,
+                    "scc_map": scc_map,
+                    "topo_order": topo_order,
+                    "execution_orders": execution_orders,
+                }
+            )
 
     def convert_code_format(self, code):
+        replacements = {
+            "①": "_01",
+            "②": "_02",
+            "③": "_03",
+            "④": "_04",
+            "⑤": "_05",
+            "⑥": "_06",
+            "⑦": "_07",
+            "⑧": "_08",
+            "⑨": "_09",
+        }
         parts = code.split("_")
         prefix = parts[0].replace(" ", "")
         parts[1] = parts[1].replace(".", "")
         middle = "".join(["0" + char for char in parts[1]])
         suffix = "0" + parts[2][1]
+        if any(key in code for key in replacements):
+            suffix += replacements[code[-1]]
+
         return f"{prefix}_{middle}_{suffix}"
 
-    def build_graph(self, df):
+    def build_graph(self, df, module_df):
         graph = defaultdict(list)
         reverse_graph = defaultdict(list)
-        nodes = set(self.module_df["code"])
+        nodes = set(module_df["code"])
 
         for _, row in df.iterrows():
             if row["parent_code"] in nodes and row["child_code"] in nodes:
@@ -44,13 +77,6 @@ class RuleUnitCallingDescriptor:
                 reverse_graph[row["child_code"]].append(row["parent_code"])
 
         return graph, reverse_graph
-
-    def get_roots(self):
-        roots = []
-        for node in self.graph:
-            if not self.reverse_graph[node]:
-                roots.append(node)
-        return roots
 
     def tarjan_scc(self, graph):
         index = 0
@@ -88,6 +114,20 @@ class RuleUnitCallingDescriptor:
         for node in list(graph):
             if node not in indices:
                 strongconnect(node)
+
+        return sccs
+
+    def ensure_all_nodes_in_scc(self, sccs, graph):
+        """
+        그래프의 모든 노드가 SCC에 포함되도록 보장
+        """
+        all_nodes = set(graph.keys())
+        scc_nodes = set(node for scc in sccs for node in scc)
+        missing_nodes = all_nodes - scc_nodes
+
+        # 모든 노드를 포함하도록 SCC 재구성
+        if missing_nodes:
+            sccs.append(list(missing_nodes))
 
         return sccs
 
@@ -129,19 +169,25 @@ class RuleUnitCallingDescriptor:
         else:
             raise Exception("Graph has at least one cycle")
 
-    def get_execution_orders(self):
-        module_codes = set(self.module_df["code"])
+    def get_execution_orders(self, module_df, topo_order, sccs):
+        module_codes = set(module_df["code"])
         rule_codes = set(self.df["child_code"]) | set(self.df["parent_code"])
 
         independent_rules = [code for code in module_codes if code not in rule_codes]
 
         dependent_execution_order = []
-        for scc_index in self.topo_order:
-            scc = self.sccs[scc_index]
-            if len(scc) > 1:
-                dependent_execution_order.append(scc)
-            else:
-                dependent_execution_order.extend(scc)
+
+        if (
+            len(module_codes) == len(sccs) and len(sccs) > 1
+        ):  # 순환참조가 존재하지 않으면 하나로 묶어버리기
+            dependent_execution_order.append(list(module_codes))
+        else:
+            for scc_index in topo_order:
+                scc = sccs[scc_index]
+                if len(scc) > 1:
+                    dependent_execution_order.append(scc)
+                else:
+                    dependent_execution_order.extend(scc)
 
         return independent_rules + dependent_execution_order
 
@@ -150,19 +196,31 @@ class ACCEngine:
     def __init__(
         self,
         rule_file,
-        module_file,
         resource_path,
-        openapi_file="../api_server/openapi/tomok-api.yaml",
+        module_file_path,
+        openapi_file="/mnt/raid6/jaewook133/tomok/acc_server2/openapi/tomok-api.yaml",  # 보안 위해 수정 필요
     ):
         self.var_cache = {"pass_fail": 0}
         self.openapi_spec = None
         rule_file_path = join(resource_path, rule_file)
-        module_file_path = join(resource_path, module_file)
+        module_files = [
+            join(module_file_path, f)
+            for f in sorted(os.listdir(module_file_path))
+            if f.endswith(".csv")
+        ]
         self.rule_unit_descriptor = RuleUnitCallingDescriptor(
-            rule_file_path, module_file_path
+            rule_file_path, module_files
         )
-        self.execution_orders = self.rule_unit_descriptor.execution_orders
+        self.execution_orders = [
+            result["execution_orders"] for result in self.rule_unit_descriptor.results
+        ]
         self.load_openapi_spec(openapi_file)
+
+        self.module_names = [
+            f.split("_")[-1].replace(".csv", "")
+            for f in sorted(os.listdir(module_file_path))
+            if f.endswith(".csv")
+        ]
 
     def load_openapi_spec(self, openapi_file):
         with open(openapi_file, "r") as fp:
@@ -189,9 +247,20 @@ class ACCEngine:
 
     def get_input_values(self, entity, rule_code: str):
         def build_KRP_string(rule_code: str):
+            replacements = {
+                "01": " ①",
+                "02": " ②",
+                "03": " ③",
+                "04": " ④",
+                "05": " ⑤",
+                "06": " ⑥",
+                "07": " ⑦",
+                "08": " ⑧",
+                "09": " ⑨",
+            }
             template = "KRPset_{} {} {} {}_{} ({})"
             temp = rule_code.split("_")
-            return template.format(
+            code = template.format(
                 temp[0][:3],
                 temp[0][3:5],
                 temp[0][5:7],
@@ -199,11 +268,13 @@ class ACCEngine:
                 f"{temp[1][1]}.{temp[1][3]}.{temp[1][5]}.{temp[1][7]}",
                 temp[2][-1],
             )
+            if len(temp) == 4:
+                code += replacements[temp[-1]]
+            return code
 
         path = self.get_api_path(rule_code)
         krp_string = build_KRP_string(rule_code)
         input_vars = self.get_input_variables(path)
-
         input_values = {}
         for item in input_vars:
             input_values[item] = entity[krp_string][item]
@@ -231,11 +302,12 @@ class ACCEngine:
         return response.json()
 
     def run_execution_orders(self):
-        for order in self.execution_orders:
-            if isinstance(order, list):
-                self.run_scc(order)
-            else:
-                self.run_unit(order)
+        for execution_order in self.execution_orders:
+            for order in execution_order:
+                if isinstance(order, list):
+                    self.run_scc(order)
+                else:
+                    self.run_unit(order)
 
     def run_scc(self, scc):
         while True:
@@ -264,22 +336,21 @@ class ACCController:
     def __init__(
         self,
         resource_path,
+        module_file_path,
         rule_file="tree_temp2.csv",
-        module_file="module_temp.csv",
     ):
         self.rule_file = rule_file
-        self.module_file = module_file
         self.reader = None
         self.entities = []
         self.subtype = ""
         self.flag = False
         self.engine = ACCEngine(
             rule_file=self.rule_file,
-            module_file=self.module_file,
             resource_path=resource_path,
+            module_file_path=module_file_path,
         )
         self.log = []
-    
+
     def list_ifc_files(self):
         return os.listdir(self.ifc_dir)
 
@@ -295,22 +366,37 @@ class ACCController:
             self.entities = self.reader.get_products_by_subtype(self.subtype)
         return self.entities
 
-    def run_verification(self) -> List[Dict[str, Any]]:
+    def run_verification(self, module_index: int) -> List[Dict[str, Any]]:
+        """
+        특정 모듈 인덱스를 사용하여 검증을 수행합니다.
+        :param module_index: 사용하려는 모듈의 인덱스
+        :return: 검증 결과 리스트
+        """
         if not self.entities:
             return []
 
+        # Check if the module index is within the valid range
+        if module_index < 0 or module_index >= len(self.engine.execution_orders):
+            raise IndexError(
+                f"Invalid module index: {module_index}. Available range is 0 to {len(self.engine.execution_orders) - 1}."
+            )
+
         self.flag = True
         results = []
+        execution_orders = self.engine.execution_orders[module_index]
+
         for entity_index, entity in enumerate(self.entities):
             entity_result = {"index": entity_index, "result": {"ccc_results": []}}
             self.engine.current_entity = entity  # 엔진에 현재 엔티티를 설정
-            for order_index, order in enumerate(self.engine.execution_orders):
+
+            for order_index, order in enumerate(execution_orders):
                 ccc_result = {"ccc_index": order_index, "log": []}
                 if isinstance(order, list):
                     while True:
                         for code in order:
                             ccc_result["log"].append(f"룰유닛 {code} 실행")
                             try:
+                                print("enter try")
                                 input_value = self.engine.get_input_values(entity, code)
                                 ccc_result["log"].append(f"입력 변수: {input_value}")
                                 path = self.engine.get_api_path(code)
@@ -354,7 +440,9 @@ class ACCController:
 
 # Example usage
 if __name__ == "__main__":
-    acc_controller = ACCController()
+    acc_controller = ACCController(
+        resource_path="path_to_resource", module_directory="path_to_module_directory"
+    )
 
     # List IFC files
     ifc_files = acc_controller.list_ifc_files()
@@ -370,12 +458,10 @@ if __name__ == "__main__":
         entities = acc_controller.search_entities()
         print(f"Found entities: {entities}")
 
-        # Specify the execution order index to run
-        execution_order_index = 0  # 예시로 0번째 실행 오더를 사용
+        # Run verification with a specific module index
         try:
-            verification_results = acc_controller.run_verification(
-                execution_order_index
-            )
+            module_index = 0  # 예시로 첫 번째 모듈 파일을 사용
+            verification_results = acc_controller.run_verification(module_index)
             print("Verification results:", json.dumps(verification_results, indent=2))
         except IndexError as e:
             print(f"Error: {e}")

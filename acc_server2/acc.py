@@ -20,6 +20,7 @@ from tomok import IFCReader, RuleIFCController, RuleUnitController, ACCControlle
 logger = logging.getLogger(__name__)
 ifc_path = "uploads/"
 temp_files = "./temp_files"
+module_file_path = "./temp_files/modules"
 os.makedirs(ifc_path, exist_ok=True)
 CRYPT = ContextVar("crypt", default=None)
 RIC = ContextVar("RuleIFCController", default=None)
@@ -33,8 +34,8 @@ def acc_init(app):
     acc_relpath = os.path.relpath(to_absolute_path(temp_files), os.getcwd())
     ac = ACCController(
         resource_path=temp_files,
+        module_file_path=module_file_path,
         rule_file="tree_temp2.csv",
-        module_file="module_temp.csv",
     )
     AC.set(ac)
 
@@ -73,7 +74,8 @@ def get_modules(user) -> Dict:
     ac = AC.get()
     orders = ac.get_execution_orders()
     temp = {}
-    temp["0"] = orders
+    for i in range(len(orders)):
+        temp[i] = orders[i]
     return {
         "modules": temp,
         "status": 200,
@@ -103,12 +105,7 @@ def verify(user, *args, **kwargs) -> Dict:
 
 def verify_module(user, *args, **kwargs) -> Dict:
     crypt = CRYPT.get()
-    # ac = AC.get()
-    ac = ACCController(
-        resource_path=temp_files,
-        rule_file="tree_temp2.csv",
-        module_file="module_temp.csv",
-    )
+    ac = AC.get()
 
     token = kwargs["body"]["ifctoken"]
     module_index = kwargs["body"]["module_index"]
@@ -120,9 +117,30 @@ def verify_module(user, *args, **kwargs) -> Dict:
     ac.load_ifc_file(filepath)
     ac.set_subtype(subtype)
     entities = ac.search_entities()
-    print(len(entities))
+    print("# of Entities:", len(entities))
 
-    results = ac.run_verification()
+    results = ac.run_verification(module_index)
+
+    for idx, result_entity in enumerate(results):
+        flag = True
+        input_values = {}
+        for ccc_results in result_entity["result"]["ccc_results"]:
+            if "False" in ccc_results["log"][-1]:
+                flag = False
+            ccc_input_values = [
+                eval(x.replace("입력 변수: ", ""))
+                for x in ccc_results["log"]
+                if "입력 변수:" in x
+            ]
+            for x in ccc_input_values:
+                input_values.update(x)
+
+        results[idx]["module_result"] = {
+            "input_values": input_values,
+            "result": "모듈 [{}] 실행 결과: {}".format(
+                ac.engine.module_names[module_index], flag
+            ),
+        }
 
     return {
         "results": results,
