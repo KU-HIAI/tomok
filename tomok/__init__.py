@@ -9,7 +9,7 @@ from .core.results import (
     MultiValueResult,
     RuleUnitResult,
 )
-from .core.decorator import rule_method
+from .core.decorator import rule_method, table_function
 from .core.rule_unit_controller import RuleUnitController
 from .core.acc_controller import ACCController
 
