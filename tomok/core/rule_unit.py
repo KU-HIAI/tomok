@@ -44,7 +44,7 @@ class RuleUnit:
         ]
         return method_list
 
-    def _get_mermaid_ink_url(self, flowchart_str, theme="default", bgColor='!white'):
+    def _get_mermaid_ink_url(self, flowchart_str, theme="default", bgColor="!white"):
         json_obj = {"code": flowchart_str, "mermaid": {"theme": theme}}
         pako_str = self._encode_pako(json_obj)
         url = f"https://mermaid.ink/img/pako:{pako_str}?bgColor={bgColor}"
@@ -66,7 +66,7 @@ class RuleUnit:
 
         display(Markdown(f"![]({img_url})"))
 
-    def _get_filename(self, filename=None, saved_directory=None, extension='png'):
+    def _get_filename(self, filename=None, saved_directory=None, extension="png"):
         # 파일 이름이 제공되지 않은 경우, 클래스 이름과 '.png' 확장자를 사용합니다.
         if not filename:
             class_name = self.__class__.__name__
@@ -80,7 +80,7 @@ class RuleUnit:
         return filename
 
     def save_flowchart(self, filename=None, saved_directory=None):
-        filename = self._get_filename(filename, saved_directory, 'png')
+        filename = self._get_filename(filename, saved_directory, "png")
 
         response = requests.get(self._get_mermaid_ink_url(self.flowchart))
         if response.status_code == 200:
@@ -96,16 +96,17 @@ class RuleUnit:
         from IPython.display import display, Markdown
 
         display(Markdown(self.content))
-    
+
     def save_content_md(self, filename=None, saved_directory=None):
-        filename = self._get_filename(filename, saved_directory, 'md')
+        filename = self._get_filename(filename, saved_directory, "md")
         with open(filename, "w") as file:
             file.write(self.content)
             print(f"건설기준문서내용이 {filename}으로 저장되었습니다.")
-    
+
     def save_content_html(self, filename=None, saved_directory=None):
-        filename = self._get_filename(filename, saved_directory, 'html')
+        filename = self._get_filename(filename, saved_directory, "html")
         from markdown import markdown
+
         with open(filename, "w") as file:
             file.write(markdown(self.content))
             print(f"건설기준문서내용이 {filename}으로 저장되었습니다.")
@@ -125,23 +126,22 @@ class RuleUnit:
             return var_pattern.findall(arg_block)
         else:
             return []
-    
+
     def _find_return_docstring_variables(self, func):
         """Find return variables in the given function's docstring."""
         docstring = inspect.getdoc(func)
-    
+
         # Define regex patterns for returns and variable names/descriptions
         return_pattern = re.compile(r"Returns:\n(.+?)(\n\n|$)", re.S)
         var_pattern = re.compile(r"(\w+)\s\(([\w.]+)\)")
-    
+
         return_block_match = return_pattern.search(docstring)
-    
+
         if return_block_match:
             return_block = return_block_match.group(1)
             return var_pattern.findall(return_block)
         else:
             return []
-    
 
     def _get_source_body(self, func):
         source = inspect.getsource(func)
@@ -172,20 +172,24 @@ class RuleUnit:
     def wrap_value(self, type_str, value):
         def parse_bool(s):
             s = s.strip().lower()
-            if s == 'true':
+            if s == "true":
                 return True
-            elif s == 'false':
+            elif s == "false":
                 return False
             else:
-                raise ValueError("bool 타입 변수에는 True 또는 False를 입력해야 합니다.")
+                raise ValueError(
+                    "bool 타입 변수에는 True 또는 False를 입력해야 합니다."
+                )
 
         def parse_list(s):
             if isinstance(s, list):
                 return s
             elif isinstance(s, str):
                 s = s.strip()
-                assert re.fullmatch(r"\[\d+(\.\d+)?(,\s?\d+(\.\d+)?)*]", s), "[1, 2, 3]과 같은 식으로 입력해야 합니다."
-                return list(map(float, s[1:-1].split(',')))
+                assert re.fullmatch(
+                    r"\[\d+(\.\d+)?(,\s?\d+(\.\d+)?)*]", s
+                ), "[1, 2, 3]과 같은 식으로 입력해야 합니다."
+                return list(map(float, s[1:-1].split(",")))
             else:
                 raise ValueError("list 형식으로 파싱할 수 없습니다.")
 
@@ -209,7 +213,9 @@ class RuleUnit:
         print("\033[1m[메타 데이터 검증]\033[0m")
         print("acc_able: ", self.acc_able)
         if self.acc_able is not None:
-            print("\033[92m" + "[통과]" + "\033[0m" + " acc 가능여부가 설정되어 있습니다.")
+            print(
+                "\033[92m" + "[통과]" + "\033[0m" + " acc 가능여부가 설정되어 있습니다."
+            )
         else:
             print(
                 "\033[91m"
@@ -243,8 +249,15 @@ class RuleUnit:
             if is_variables_matched:
                 print("\033[92m" + "[통과]" + "\033[0m" + " 함수와 docstring 인자 일치")
             else:
-                print("\033[91m" + "[오류]" + "\033[0m" + " 함수와 docstring 인자 불일치.\n")
-                print("맞는데도 이 오류가 발생한다면 docstring의 띄어쓰기를 확인하세요.")
+                print(
+                    "\033[91m"
+                    + "[오류]"
+                    + "\033[0m"
+                    + " 함수와 docstring 인자 불일치.\n"
+                )
+                print(
+                    "맞는데도 이 오류가 발생한다면 docstring의 띄어쓰기를 확인하세요."
+                )
                 error_flag = 1
 
             # 입력 인자에 userdefined 있는지 여부
@@ -275,15 +288,26 @@ class RuleUnit:
 
             # 룰 실행여부 검증
             print("\033[1m[룰 실행 여부 검증]\033[0m")
-            if(len(set(input_list).difference(set(docstring_params.keys()))) > 0):
-                print('\033[91m' + '[오류]' + '\033[0m' + ' 입력 인자 중 일부가 docstring에 기재되어 있지 않습니다. 자료형(예: float, str, int)을 알 수 없으므로 룰 실행 여부 검정이 불가합니다.')
+            if len(set(input_list).difference(set(docstring_params.keys()))) > 0:
+                print(
+                    "\033[91m"
+                    + "[오류]"
+                    + "\033[0m"
+                    + " 입력 인자 중 일부가 docstring에 기재되어 있지 않습니다. 자료형(예: float, str, int)을 알 수 없으므로 룰 실행 여부 검정이 불가합니다."
+                )
                 print(set(input_list).difference(set(docstring_params.keys())))
-                print('\033[91m' + '위 인자에 대한 docstring 작성 후 다시 실행 해주시기 바랍니다.' + '\033[0m')
+                print(
+                    "\033[91m"
+                    + "위 인자에 대한 docstring 작성 후 다시 실행 해주시기 바랍니다."
+                    + "\033[0m"
+                )
                 return 1
             if with_stdin:  # input()의 stdin 입력 없이 검토하는 기능 추가
                 user_input = {}
                 for param in input_list:
-                    user_input[param] = input(f"{param} ({docstring_params[param]}) 인자의 값을 넣어주세요 : ")
+                    user_input[param] = input(
+                        f"{param} ({docstring_params[param]}) 인자의 값을 넣어주세요 : "
+                    )
                     try:
                         user_input[param] = self.wrap_value(
                             docstring_params[param], user_input[param]
@@ -309,7 +333,10 @@ class RuleUnit:
                 else:
                     # print('\033[91m' + '[오류]' + '\033[0m' + ' 반환 자료는 ResultBase, PassFailResult, SingleValueResult, MultiValueResult 등 이어야 합니다.')
                     print(
-                        "\033[91m" + "[오류]" + "\033[0m" + " 반환 자료형은 RuleUnitResult 이어야 합니다."
+                        "\033[91m"
+                        + "[오류]"
+                        + "\033[0m"
+                        + " 반환 자료형은 RuleUnitResult 이어야 합니다."
                     )
                     return 1
             else:
@@ -317,13 +344,35 @@ class RuleUnit:
             print("")
 
             docstring_return_params = self._find_return_docstring_variables(func)
-            docstring_return_params = {var[0]: var[1] for var in docstring_return_params}
+            docstring_return_params = {
+                var[0]: var[1] for var in docstring_return_params
+            }
 
             def validate_return_docstring(returned_value):
-                if len(set(returned_value.result_variables.keys()).difference(set(docstring_return_params))) > 0:
-                    print('\033[91m' + '[오류]' + '\033[0m' + ' 반환 인자 중 일부가 docstring에 기재되어 있지 않습니다.')
-                    print(set(returned_value.result_variables.keys()).difference(set(docstring_return_params)))
-                    print('\033[91m' + '위 인자의 변수명이 docstring에 기록되어 있는지, 변수명에 오류가 없는지 확인 바랍니다.' + '\033[0m')
+                if (
+                    len(
+                        set(returned_value.result_variables.keys()).difference(
+                            set(docstring_return_params)
+                        )
+                    )
+                    > 0
+                ):
+                    print(
+                        "\033[91m"
+                        + "[오류]"
+                        + "\033[0m"
+                        + " 반환 인자 중 일부가 docstring에 기재되어 있지 않습니다."
+                    )
+                    print(
+                        set(returned_value.result_variables.keys()).difference(
+                            set(docstring_return_params)
+                        )
+                    )
+                    print(
+                        "\033[91m"
+                        + "위 인자의 변수명이 docstring에 기록되어 있는지, 변수명에 오류가 없는지 확인 바랍니다."
+                        + "\033[0m"
+                    )
                     print("")
                     return 1
                 else:
@@ -338,7 +387,7 @@ class RuleUnit:
             value_dict = {  # 임의로 설정한 극단적 값
                 "int": [-1, 0, 10, 100, 99999],
                 "float": [-1.0, 0.0, 10.0, 100.0, 99999.9],
-                "str": ['', '테스트', 'Test!Test!Test!Test!Test!Test!\nTest!'],
+                "str": ["", "테스트", "Test!Test!Test!Test!Test!Test!\nTest!"],
                 "bool": [True, False],
                 "list": [[-1.0], [0.0, 999.9], [0.0]],
                 "dict": [{"1": 1}],
@@ -348,9 +397,16 @@ class RuleUnit:
             try:  # 오류메시지를 구체적으로 출력
                 candidates = [value_dict[v] for v in arg_to_type.values()]
             except KeyError:
-                print("\033[91m" + "[오류]" + "\033[0m" + " docstring의 변수 type이 정확하게 적혀 있는지 확인해주세요")
+                print(
+                    "\033[91m"
+                    + "[오류]"
+                    + "\033[0m"
+                    + " docstring의 변수 type이 정확하게 적혀 있는지 확인해주세요"
+                )
                 raise
-            for extreme_args in islice(product(*candidates), 10000):  # 나중에 product의 순서가 랜덤으로 되도록 해야 함
+            for extreme_args in islice(
+                product(*candidates), 10000
+            ):  # 나중에 product의 순서가 랜덤으로 되도록 해야 함
                 try:
                     output = func(*extreme_args)
 
@@ -360,16 +416,25 @@ class RuleUnit:
 
                     # return type 검사
                     if not isinstance(output, ResultBase):
-                        print("\033[91m" + "[오류]" + "\033[0m" + " RuleUnitResult를 반환하지 않는 경우 존재")
+                        print(
+                            "\033[91m"
+                            + "[오류]"
+                            + "\033[0m"
+                            + " RuleUnitResult를 반환하지 않는 경우 존재"
+                        )
                         raise TypeError("RuleUnit 반환형 오류")
 
                 except AssertionError:
                     pass  # no problem with AssertionError when given extreme arguments
                 except TypeError:
                     # print("\033[91m" + "[오류]" + "\033[0m" + " 룰 안전하지 않음")
-                    print('\033[1m' + f"오류 당시 입력변수" + '\033[0m' + f": {str({k:v for k, v in zip(input_list, extreme_args)})}")
+                    print(
+                        "\033[1m"
+                        + f"오류 당시 입력변수"
+                        + "\033[0m"
+                        + f": {str({k:v for k, v in zip(input_list, extreme_args)})}"
+                    )
                     raise
             print("\033[92m" + "[통과]" + "\033[0m" + " 극단적 입력값 테스트 완료")
 
         return error_flag
-
