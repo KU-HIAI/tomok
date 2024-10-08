@@ -17,51 +17,62 @@ class AttrDict(dict):
 
 
 class TableUnitController:
-    def __init__(self, path="tableunits", mode="local"):
-        self.tableunits: List[TableUnit] = []
-        self.tableunits_dict = AttrDict()
-        regex = r"class (.*)\(.*TableUnit\):"
-        path_dir = os.path.abspath(path)
-        # TableUnit 경로를 sys.path에 추가합니다.
-        backup_sys_path = [path for path in sys.path]
-        sys.path = [path_dir]
-        if mode == "local":
-            for curpath, subdirs, filenames in os.walk(path):
-                for filename in filenames:
-                    if filename.endswith(".py"):
-                        code = open(
-                            os.path.join(curpath, filename), encoding="utf-8"
-                        ).read()  # encoding= 추가!
-                        matches = re.findall(regex, code, re.MULTILINE)
-                        if len(matches) > 0:
-                            if self._is_valid_filename(filename):
-                                for match in matches:
-                                    cls_name = match.strip()
-                                    module_name = filename[:-3]
-                                    relative_path = os.path.relpath(curpath, path)
-                                    import_name = (
-                                        os.path.join(relative_path, filename)
-                                        .lstrip("./")
-                                        .replace(os.path.sep, ".")[:-3]
-                                    )
-                                    tableunit = getattr(
-                                        import_module(import_name), cls_name
-                                    )()
-                                    tableunit.filename = filename
-                                    tableunit.filepath = os.path.join(curpath, filename)
-                                    self.tableunits.append(tableunit)
+    _instance = None  # class level 인스턴스 저장 변수
 
-                                    # Adding object to tableunits_dict
-                                    keys = relative_path.split(os.path.sep) + [
-                                        module_name
-                                    ]
-                                    current_dict = self.tableunits_dict
-                                    for key in keys:
-                                        if key not in current_dict:
-                                            current_dict[key] = AttrDict()
-                                        current_dict = current_dict[key]
-                                    current_dict[cls_name] = tableunit
-        sys.path = [path for path in backup_sys_path]
+    def __new__(cls, *args, **kwargs):
+        if cls._instance is None:
+            cls._instance = super(TableUnitController, cls).__new__(cls)
+        return cls._instance
+
+    def __init__(self, path="tableunits", mode="local"):
+        if not hasattr(self, "initialized"):
+            self.initialized = True
+            self.tableunits: List[TableUnit] = []
+            self.tableunits_dict = AttrDict()
+            regex = r"class (.*)\(.*TableUnit\):"
+            path_dir = os.path.abspath(path)
+            # TableUnit 경로를 sys.path에 추가합니다.
+            backup_sys_path = [path for path in sys.path]
+            sys.path = [path_dir]
+            if mode == "local":
+                for curpath, subdirs, filenames in os.walk(path):
+                    for filename in filenames:
+                        if filename.endswith(".py"):
+                            code = open(
+                                os.path.join(curpath, filename), encoding="utf-8"
+                            ).read()  # encoding= 추가!
+                            matches = re.findall(regex, code, re.MULTILINE)
+                            if len(matches) > 0:
+                                if self._is_valid_filename(filename):
+                                    for match in matches:
+                                        cls_name = match.strip()
+                                        module_name = filename[:-3]
+                                        relative_path = os.path.relpath(curpath, path)
+                                        import_name = (
+                                            os.path.join(relative_path, filename)
+                                            .lstrip("./")
+                                            .replace(os.path.sep, ".")[:-3]
+                                        )
+                                        tableunit = getattr(
+                                            import_module(import_name), cls_name
+                                        )()
+                                        tableunit.filename = filename
+                                        tableunit.filepath = os.path.join(
+                                            curpath, filename
+                                        )
+                                        self.tableunits.append(tableunit)
+
+                                        # Adding object to tableunits_dict
+                                        keys = relative_path.split(os.path.sep) + [
+                                            module_name
+                                        ]
+                                        current_dict = self.tableunits_dict
+                                        for key in keys:
+                                            if key not in current_dict:
+                                                current_dict[key] = AttrDict()
+                                            current_dict = current_dict[key]
+                                        current_dict[cls_name] = tableunit
+            sys.path = [path for path in backup_sys_path]
 
     def __getattr__(self, name):
         if name in self.tableunits_dict:
@@ -83,3 +94,9 @@ class TableUnitController:
                 "table 파일명에 . 글자는 허용되지 않습니다. 파일명에서 . 을 제거해주시기 바랍니다."
             )
         return True
+
+    @classmethod
+    def instance(cls):
+        if cls._instance is None:
+            cls._instance = cls()
+        return cls._instance
