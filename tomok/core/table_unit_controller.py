@@ -8,6 +8,7 @@ from click import FileError
 
 # framework
 from .table_unit import TableUnit
+from .repo import prepare_tf_repo, TF_REPO_ID
 
 
 class AttrDict(dict):
@@ -24,8 +25,9 @@ class TableUnitController:
             cls._instance = super(TableUnitController, cls).__new__(cls)
         return cls._instance
 
-    def __init__(self, path="tableunits", mode="local"):
+    def __init__(self, TF_REPO_TOKEN, path=TF_REPO_ID, mode="local"):
         if not hasattr(self, "initialized"):
+            prepare_tf_repo()
             self.initialized = True
             self.tableunits: List[TableUnit] = []
             self.tableunits_dict = AttrDict()

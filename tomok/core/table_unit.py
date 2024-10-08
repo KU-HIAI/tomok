@@ -10,6 +10,7 @@ import ast
 import textwrap
 import random
 from .util import typename, import_check
+from .repo import prepare_tf_repo, tf_commit
 from .results import ResultBase
 
 
@@ -144,6 +145,14 @@ class TableUnit:
             # 더 많은 타입들을 이곳에 추가하면 됩니다.
         }
         return type_dict[type_str](value)
+
+    def regist(self, TF_REPO_TOKEN, target_path, commit_msg=None, source_file='working.py'):
+        prepare_tf_repo(overwrite=True, TF_REPO_TOKEN=TF_REPO_TOKEN)
+        tf_commit(target_path=target_path,
+                  target_class=self,
+                  TF_REPO_TOKEN=TF_REPO_TOKEN,
+                  commit_msg=commit_msg,
+                  source_file=source_file)
 
     def verify(self, with_stdin=True):
         error_flag = 0  # 하나라도 오류가 있으면 1를 반환
