@@ -98,7 +98,7 @@ class TableUnitController:
         return True
 
     @classmethod
-    def instance(cls):
+    def instance(cls, TF_REPO_TOKEN):
         if cls._instance is None:
-            cls._instance = cls()
+            cls._instance = cls(TF_REPO_TOKEN)
         return cls._instance
