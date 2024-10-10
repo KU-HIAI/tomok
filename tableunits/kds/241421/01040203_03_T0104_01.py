@@ -1,10 +1,4 @@
-import sys
-import os
-
 from tomok import TableUnit, table_function, RuleUnitResult
-
-import math
-from typing import List
 
 
 class KDS241421_01040203_03_T0104_01(TableUnit):

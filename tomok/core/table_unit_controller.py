@@ -26,7 +26,7 @@ class TableUnitController:
         return cls._instance
 
     def __init__(self, TF_REPO_TOKEN, path=TF_REPO_ID, mode="local"):
-        if not hasattr(self, "initialized"):
+        if "initialized" not in self.__dict__:
             prepare_tf_repo()
             self.initialized = True
             self.tableunits: List[TableUnit] = []
