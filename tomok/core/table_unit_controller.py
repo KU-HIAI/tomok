@@ -27,7 +27,7 @@ class TableUnitController:
 
     def __init__(self, TF_REPO_TOKEN, path=TF_REPO_ID, mode="local"):
         if "initialized" not in self.__dict__:
-            prepare_tf_repo()
+            prepare_tf_repo(True, TF_REPO_TOKEN)
             self.initialized = True
             self.tableunits: List[TableUnit] = []
             self.tableunits_dict = AttrDict()
