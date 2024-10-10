@@ -23,9 +23,12 @@ def prepare_tf_repo(overwrite, TF_REPO_TOKEN):
 def tf_commit(target_class, target_path, TF_REPO_TOKEN, commit_msg=None, source_file='working.py'):
     full_path = os.path.join(TF_REPO_ID, target_path)
     os.makedirs(full_path, exist_ok=True)
-    target_file_path = os.path.join(full_path, f'{target_class.__class__.__name__}.py')
-    
-    print(target_file_path)
+    filename = f'{target_class.__class__.__name__}.py'
+    if filename.lower().startswith('kds') and '_' in filename:
+        filename = '_'.join(filename.split('_')[1:])
+    if filename.lower().startswith('kcs') and '_' in filename:
+        filename = '_'.join(filename.split('_')[1:])
+    target_file_path = os.path.join(full_path, filename)
     
     shutil.copyfile(source_file, target_file_path)
     
@@ -33,7 +36,7 @@ def tf_commit(target_class, target_path, TF_REPO_TOKEN, commit_msg=None, source_
     try:
         subprocess.check_call(['git', '-C', TF_REPO_ID, 'add', '.'])
         if not commit_msg:
-            subprocess.check_call(['git', '-C', TF_REPO_ID, 'commit', '-m', f'Add {target_class.__class__.__name__} file'])
+            subprocess.check_call(['git', '-C', TF_REPO_ID, 'commit', '-m', f'Add {target_file_path} file'])
         else:
             subprocess.check_call(['git', '-C', TF_REPO_ID, 'commit', '-m', commit_msg])
         subprocess.check_call(['git', '-C', TF_REPO_ID, 'push'])
