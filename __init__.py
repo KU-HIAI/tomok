@@ -1,7 +1,7 @@
 import importlib.util
 
 from .tomok.core.rule_unit import RuleUnit
-from .tomok.core.table_unit import TableUnit
+from .tomok.core.table_unit import TableUnit, TableCellFunction
 from .tomok.core.decorator import rule_method, table_function
 from .tomok.core.rule_unit_controller import RuleUnitController
 from .tomok.core.table_unit_controller import TableUnitController
