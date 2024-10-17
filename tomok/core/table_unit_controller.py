@@ -25,9 +25,10 @@ class TableUnitController:
             cls._instance = super(TableUnitController, cls).__new__(cls)
         return cls._instance
 
-    def __init__(self, TF_REPO_TOKEN, path=TF_REPO_ID, mode="local"):
+    def __init__(self, TF_REPO_TOKEN, path=TF_REPO_ID, mode="github"):
         if "initialized" not in self.__dict__:
-            prepare_tf_repo(True, TF_REPO_TOKEN)
+            if mode == "github":
+                prepare_tf_repo(True, TF_REPO_TOKEN)
             self.initialized = True
             self.tableunits: List[TableUnit] = []
             self.tableunits_dict = AttrDict()
@@ -36,7 +37,7 @@ class TableUnitController:
             # TableUnit 경로를 sys.path에 추가합니다.
             backup_sys_path = [path for path in sys.path]
             sys.path = [path_dir]
-            if mode == "local":
+            if mode in ["local", "github"]:
                 for curpath, subdirs, filenames in os.walk(path):
                     for filename in filenames:
                         if filename.endswith(".py"):
@@ -75,6 +76,7 @@ class TableUnitController:
                                             current_dict = current_dict[key]
                                         current_dict[cls_name] = tableunit
             sys.path = [path for path in backup_sys_path]
+            print('Table unit controller instance has been created.')
 
     def __getattr__(self, name):
         if name in self.tableunits_dict:

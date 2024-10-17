@@ -52,7 +52,7 @@ class TableUnit(BaseUnit):
         ]
         return method_list
     
-    def setup_tablle(self):
+    def setup_table(self):
         pass
 
     def regist(self, TF_REPO_TOKEN, target_path, commit_msg=None, source_file='working.py'):
