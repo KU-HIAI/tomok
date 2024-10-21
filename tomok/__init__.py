@@ -1,7 +1,7 @@
 import importlib.util
 
 from .core.rule_unit import RuleUnit
-from .core.table_unit import TableUnit
+from .core.table_unit import TableUnit, TableCellFunction
 from .core.results import (
     ResultBase,
     PassFailResult,
