@@ -12,17 +12,17 @@ class TableCellFunction:
     def __init__(self, func, label):
         self.func = func
         self.label = label
-        
+
     def __call__(self, *args, **kwargs):
         return self.func(*args, **kwargs)
 
     def __repr__(self):
-        return '⚙️' + self.label
+        return "⚙️" + self.label
 
 
 class TableUnit(BaseUnit):
     priority: int = 1
-    table_able: bool = True
+    acc_able: bool = True
     version: float = 1.0
     author: str = "unknown"
     ref_code: str = "KDS # # #"
@@ -51,25 +51,29 @@ class TableUnit(BaseUnit):
             == "tomok.tomok.core.decorator.TableFunction"
         ]
         return method_list
-    
+
     def setup_table(self):
         pass
 
-    def regist(self, TF_REPO_TOKEN, target_path, commit_msg=None, source_file='working.py'):
+    def regist(
+        self, TF_REPO_TOKEN, target_path, commit_msg=None, source_file="working.py"
+    ):
         prepare_tf_repo(overwrite=True, TF_REPO_TOKEN=TF_REPO_TOKEN)
-        tf_commit(target_path=target_path,
-                  target_class=self,
-                  TF_REPO_TOKEN=TF_REPO_TOKEN,
-                  commit_msg=commit_msg,
-                  source_file=source_file)
+        tf_commit(
+            target_path=target_path,
+            target_class=self,
+            TF_REPO_TOKEN=TF_REPO_TOKEN,
+            commit_msg=commit_msg,
+            source_file=source_file,
+        )
 
     def verify(self, with_stdin=True):
         error_flag = 0  # 하나라도 오류가 있으면 1를 반환
 
         # 메타 데이터 검증
         print("\033[1m[메타 데이터 검증]\033[0m")
-        print("table_able: ", self.table_able)
-        if self.table_able is not None:
+        print("acc_able: ", self.acc_able)
+        if self.acc_able is not None:
             print(
                 "\033[92m"
                 + "[통과]"
@@ -81,7 +85,7 @@ class TableUnit(BaseUnit):
                 "\033[91m"
                 + "[오류]"
                 + "\033[0m"
-                + " 메타데이터에 table_able (Table 가능여부)가 설정되어야 합니다. Table 가능일 경우 True 아닌 경우 False 값을 설정해야 합니다."
+                + " 메타데이터에 acc_able (Table 가능여부)가 설정되어야 합니다. Table 가능일 경우 True 아닌 경우 False 값을 설정해야 합니다."
             )
             error_flag = 1
         print("")
