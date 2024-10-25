@@ -1,6 +1,8 @@
 from typing import Optional
 from itertools import product, islice
 from pandas import DataFrame
+import pandas as pd
+from IPython.display import display, HTML
 import inspect
 from .util import typename, import_check
 from .repo import prepare_tf_repo, tf_commit
@@ -37,6 +39,7 @@ class TableUnit(BaseUnit):
     _index: int = 0
     content: str = ""
     table: DataFrame = None
+    transpose: bool = False
 
     def __init__(self):
         self.table_functions = self._regist_table_functions()
@@ -54,6 +57,26 @@ class TableUnit(BaseUnit):
     
     def setup_table(self):
         pass
+    
+    @property
+    def raw_table(self):
+        if self.table is None:
+            return
+        # Jupyter Notebook인지 판별하기 위한 기준 생성
+        try:
+            shell = get_ipython().__class__.__name__
+            pd.set_option('display.max_rows', None)
+            pd.set_option('display.max_columns', None)
+        except NameError:
+            shell = None
+        df = self.table
+        if self.transpose:
+            df = df.transpose()
+        if shell:
+            display(df)
+        else:
+            print(df.to_string())    
+        
 
     def regist(self, TF_REPO_TOKEN, target_path, commit_msg=None, source_file='working.py'):
         prepare_tf_repo(overwrite=True, TF_REPO_TOKEN=TF_REPO_TOKEN)
