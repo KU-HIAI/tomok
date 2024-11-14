@@ -31,73 +31,77 @@ def _find_docstring_variables(func):
 
     arg_block_match = arg_pattern.search(docstring)
     return_block_match = return_pattern.search(docstring)
+    
+    arg_vars = []
+    return_vars = []
 
-    if arg_block_match and return_block_match:
+    if arg_block_match:
         arg_block = arg_block_match.group(1)
         arg_vars = var_pattern.findall(arg_block)
-        return_block = return_block_match.group(1)
-        return_vars = var_pattern.findall(return_block)
-
         # Remove leading/trailing white spaces from description.
         arg_vars = [(var[0], var[1], var[2].strip()) for var in arg_vars]
+
+    if return_block_match:
+        return_block = return_block_match.group(1)
+        return_vars = var_pattern.findall(return_block)
+        # Remove leading/trailing white spaces from description.
         return_vars = [(var[0], var[1], var[2].strip()) for var in return_vars]
         
-        return arg_vars, return_vars
-    else:
-        return []
+    return arg_vars, return_vars
 
 ruc = RuleUnitController('./ruleunits')
 paths = {}
 
 for std in dict_generator(ruc.ruleunits_dict):
-    # print(len(std[-1].rule_methods))
-    uri = std[0:-2]
-    uri[0] = '/' + uri[0]
-    uri.append(std[-1].rule_methods[0].fn.__name__)
-    # print('/'.join(uri))
-    uri_str = '/'.join(uri)
-    tags = std[0]
-    if type(tags) is not list:
-        tags = [tags]
-    operation_id = ['ruleunits'] + std[0:-1]
-    operation_id.append(std[-1].rule_methods[0].fn.__name__)
-    # print('.'.join(operation_id))
-    operation_id_str = '.'.join(operation_id)
-    # print(std[-1].title)
-    args, return_args = _find_docstring_variables(std[-1].rule_methods[0].fn)
-    args_dict = {}
-    return_args_dict = {}
-    type_conv = {
-        'float': 'number',
-        'int': 'integer',
-        'integer': 'integer',
-        'str': 'string',
-        'bool': 'boolean',
-        'string': 'string',
-        'sting': 'string',
-        'List[float]': 'array'
-    }
-    type_items = {
-        'List[float]': {'type': 'number'}
-    }
-    for arg in args:
-        args_dict[arg[0]] = {
-            'type': type_conv[arg[1]],
-            'description': arg[2]
+    try:
+        # print(len(std[-1].rule_methods))
+        uri = std[0:-2]
+        uri[0] = '/' + uri[0]
+        uri.append(std[-1].rule_methods[0].fn.__name__)
+        # print('/'.join(uri))
+        uri_str = '/'.join(uri)
+        tags = std[0]
+        if type(tags) is not list:
+            tags = [tags]
+        operation_id = ['ruleunits'] + std[0:-1]
+        operation_id.append(std[-1].rule_methods[0].fn.__name__)
+        # print('.'.join(operation_id))
+        operation_id_str = '.'.join(operation_id)
+        # print(std[-1].title)
+        args, return_args = _find_docstring_variables(std[-1].rule_methods[0].fn)
+        args_dict = {}
+        return_args_dict = {}
+        type_conv = {
+            'float': 'number',
+            'int': 'integer',
+            'integer': 'integer',
+            'str': 'string',
+            'bool': 'boolean',
+            'string': 'string',
+            'sting': 'string',
+            'List[float]': 'array'
         }
-        if arg[1] in type_items:
-            args_dict[arg[0]]['items'] = type_items[arg[1]]
-    # print(std)
-    docstr = inspect.getdoc(std[-1].rule_methods[0].fn)
-    markdown = std[-1].content
-    lines = markdown.split("\n")
-    lines = [line for line in lines if line.strip() != '']
-    if len(lines) > 0:
-        if lines[0].startswith("    "):
-            lines = [line[5:] for line in lines if line.startswith("    ")]
-    markdown = '\n'.join(lines)
-    mermaid = std[-1]._get_mermaid_ink_url(std[-1].flowchart)
-    description = f"""{markdown}
+        type_items = {
+            'List[float]': {'type': 'number'}
+        }
+        for arg in args:
+            args_dict[arg[0]] = {
+                'type': type_conv[arg[1]],
+                'description': arg[2]
+            }
+            if arg[1] in type_items:
+                args_dict[arg[0]]['items'] = type_items[arg[1]]
+        # print(std)
+        docstr = inspect.getdoc(std[-1].rule_methods[0].fn)
+        markdown = std[-1].content
+        lines = markdown.split("\n")
+        lines = [line for line in lines if line.strip() != '']
+        if len(lines) > 0:
+            if lines[0].startswith("    "):
+                lines = [line[5:] for line in lines if line.startswith("    ")]
+        markdown = '\n'.join(lines)
+        mermaid = std[-1]._get_mermaid_ink_url(std[-1].flowchart)
+        description = f"""{markdown}
 
 ![]({mermaid})
 
@@ -105,6 +109,10 @@ for std in dict_generator(ruc.ruleunits_dict):
 {docstr}
 ```
 """
+    except Exception as e:
+        print(std)
+        print(str(e))
+
     paths[uri_str] = {
         'post': {
             'summary': std[-1].title,
