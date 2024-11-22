@@ -8,6 +8,7 @@ from .repo import prepare_tf_repo, tf_commit
 from .results import ResultBase
 from .base_unit import BaseUnit
 import base64
+from IPython import display
 
 
 class ImageUnit(BaseUnit):
@@ -40,6 +41,16 @@ class ImageUnit(BaseUnit):
             == "tomok.tomok.core.decorator.ImageFunction"
         ]
         return method_list
+
+    def render_image(self):
+        display.display(
+            display.HTML(
+                f'<img src="{self.image_str}" style="max-width:100%; height:auto;" alt="KDS Image" />'
+            )
+        )
+
+    def setup_table(self):
+        pass
 
     def regist(
         self, TF_REPO_TOKEN, target_path, commit_msg=None, source_file="working.py"
@@ -285,6 +296,7 @@ class ImageUnit(BaseUnit):
             print("\033[92m" + "[통과]" + "\033[0m" + " 극단적 입력값 테스트 완료")
 
             print("\033[1m[Byte64로 저장된 이미지 출력]\033[0m")
+            self.render_image()
             # 이미지 출력
 
         return error_flag
