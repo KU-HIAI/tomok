@@ -30,7 +30,7 @@ class ImageUnit(BaseUnit):
 
     def __init__(self):
         # self.image_function = self._regist_image_functions()
-        self.imageb64 = self.setup_image()
+        pass
 
     def _regist_image_functions(self):
         method_list = [
@@ -41,14 +41,6 @@ class ImageUnit(BaseUnit):
             == "tomok.tomok.core.decorator.ImageFunction"
         ]
         return method_list
-
-    def setup_image(self):
-        try:
-            imageb64 = base64.b64decode(str(self.image_str))
-            return imageb64
-        except Exception as e:
-            print(f"error: {e}")
-            return None
 
     def regist(
         self, TF_REPO_TOKEN, target_path, commit_msg=None, source_file="working.py"
@@ -83,10 +75,10 @@ class ImageUnit(BaseUnit):
         print("")
 
         print("\033[1m[이미지 함수 목록]\033[0m")
-        print(self.table_functions)
+        print(self.image_functions)
         print("")
 
-        for rule_method in self.table_functions:
+        for rule_method in self.image_functions:
             # 기반 데이터 준비
             func = rule_method.fn
             docstring = inspect.getdoc(func)
