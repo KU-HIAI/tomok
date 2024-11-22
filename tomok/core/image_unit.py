@@ -27,6 +27,7 @@ class ImageUnit(BaseUnit):
     filename: str = ""
     _index: int = 0
     content: str = ""
+    table: DataFrame = None
     image_str: str = None
 
     def __init__(self):
