@@ -29,8 +29,7 @@ class ImageUnit(BaseUnit):
     image_str: str = None
 
     def __init__(self):
-        self.image_function = self._regist_image_functions()
-        pass
+        self.image_functions = self._regist_image_functions()
 
     def _regist_image_functions(self):
         method_list = [
