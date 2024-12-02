@@ -13,6 +13,7 @@ from .core.results import (
 from .core.decorator import rule_method, table_function, image_function
 from .core.rule_unit_controller import RuleUnitController
 from .core.table_unit_controller import TableUnitController
+from .core.image_unit_controller import ImageUnitController
 from .core.acc_controller import ACCController
 
 from .core.util import *
