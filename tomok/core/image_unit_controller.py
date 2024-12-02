@@ -33,7 +33,7 @@ class ImageUnitController:
             self.imageunits: List[ImageUnit] = []
             self.imageunits_dict = AttrDict()
             regex = r"class (.*)\(.*ImageUnit\):"
-            path_dir = os.path.abspath(path + "/ImageUnits")
+            path_dir = os.path.abspath(path)
             # ImageUnit 경로를 sys.path에 추가합니다.
             backup_sys_path = [path for path in sys.path]
             sys.path = [path_dir]
@@ -79,14 +79,14 @@ class ImageUnitController:
             print("Table unit controller instance has been created.")
 
     def __getattr__(self, name):
-        if name in self.imageunits_dict:
-            return self.imageunits_dict[name]
+        if name in self.imageunits_dict["ImageUnits"]:
+            return self.imageunits_dict["ImageUnits"][name]
         else:
             raise AttributeError(f"No such attribute: {name}")
 
     def __getitem__(self, name):
-        if name in self.imageunits_dict:
-            return self.imageunits_dict[name]
+        if name in self.imageunits_dict["ImageUnits"]:
+            return self.imageunits_dict["ImageUnits"][name]
         else:
             raise KeyError(f"No such key: {name}")
 

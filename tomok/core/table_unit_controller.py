@@ -79,15 +79,15 @@ class TableUnitController:
             print("Table unit controller instance has been created.")
 
     def __getattr__(self, name):
-        if name in self.tableunits_dict:
-            return self.tableunits_dict[name]
+        if name in self.tableunits_dict["TableUnits"]:
+            return self.tableunits_dict["TableUnits"][name]
         else:
             raise AttributeError(f"No such attribute: {name}")
 
     def __getitem__(self, name):
         print(self.tableunits_dict)
-        if name in self.tableunits_dict:
-            return self.tableunits_dict[name]
+        if name in self.tableunits_dict["TableUnits"]:
+            return self.tableunits_dict["TableUnits"][name]
         else:
             raise KeyError(f"No such key: {name}")
 
