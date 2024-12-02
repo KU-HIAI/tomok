@@ -57,7 +57,7 @@ class TableUnit(BaseUnit):
 
     def setup_table(self):
         pass
-    
+
     @property
     def raw_table(self):
         if self.table is None:
@@ -65,8 +65,8 @@ class TableUnit(BaseUnit):
         # Jupyter Notebook인지 판별하기 위한 기준 생성
         try:
             shell = get_ipython().__class__.__name__
-            pd.set_option('display.max_rows', None)
-            pd.set_option('display.max_columns', None)
+            pd.set_option("display.max_rows", None)
+            pd.set_option("display.max_columns", None)
         except NameError:
             shell = None
         df = self.table
@@ -75,13 +75,13 @@ class TableUnit(BaseUnit):
         if shell:
             display(df)
         else:
-            print(df.to_string())    
-        
+            print(df.to_string())
 
     def regist(
         self, TF_REPO_TOKEN, target_path, commit_msg=None, source_file="working.py"
     ):
         prepare_tf_repo(overwrite=True, TF_REPO_TOKEN=TF_REPO_TOKEN)
+        target_path = "TableUnits/" + target_path # 그림유닛과 구분
         tf_commit(
             target_path=target_path,
             target_class=self,

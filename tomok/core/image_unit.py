@@ -57,6 +57,7 @@ class ImageUnit(BaseUnit):
         self, TF_REPO_TOKEN, target_path, commit_msg=None, source_file="working.py"
     ):
         prepare_tf_repo(overwrite=True, TF_REPO_TOKEN=TF_REPO_TOKEN)
+        target_path = "ImageUnits/" + target_path
         tf_commit(
             target_path=target_path,
             target_class=self,
