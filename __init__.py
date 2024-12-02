@@ -2,9 +2,11 @@ import importlib.util
 
 from .tomok.core.rule_unit import RuleUnit
 from .tomok.core.table_unit import TableUnit, TableCellFunction
+from .tomok.core.image_unit import ImageUnit
 from .tomok.core.decorator import rule_method, table_function, image_function
 from .tomok.core.rule_unit_controller import RuleUnitController
 from .tomok.core.table_unit_controller import TableUnitController
+from .tomok.core.image_unit_controller import ImageUnitController
 from .tomok.core.results import RuleUnitResult
 
 from .tomok.core.util import *

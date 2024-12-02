@@ -33,7 +33,7 @@ class TableUnitController:
             self.tableunits: List[TableUnit] = []
             self.tableunits_dict = AttrDict()
             regex = r"class (.*)\(.*TableUnit\):"
-            path_dir = os.path.abspath(path + "/TableUnits")
+            path_dir = os.path.abspath(path)
             # TableUnit 경로를 sys.path에 추가합니다.
             backup_sys_path = [path for path in sys.path]
             sys.path = [path_dir]
@@ -85,6 +85,7 @@ class TableUnitController:
             raise AttributeError(f"No such attribute: {name}")
 
     def __getitem__(self, name):
+        print(self.tableunits_dict)
         if name in self.tableunits_dict:
             return self.tableunits_dict[name]
         else:
