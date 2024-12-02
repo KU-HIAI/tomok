@@ -1,4 +1,3 @@
-source ~/miniconda3/etc/profile.d/conda.sh
-conda activate tomok
+export HYDRA_FULL_ERROR=1
 
 python app.py
