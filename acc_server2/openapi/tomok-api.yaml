@@ -30,10 +30,10 @@ paths:
       - api_key: []
   /kds/241451/03030303_03/Nominal_unit_end_support:
     post:
-      summary: 공칭 단위선단지지력
+      summary: 공칭 단위선단 지지력
       operationId: ruleunits.kds.241451.03030303_03.KDS241451_03030303_03.Nominal_unit_end_support
       description: "\n\n![](https://mermaid.ink/img/pako:eNqFUs9L40AU_lcec7EF21DrHqw_Ftt6WPawguKlkTK20ySQpN1kurtSWrqQFcWDPShGqZKD0j3sQrSoFPQf6kz_BydJq2UXdCaQyXvve_N9L18DlaplgjKAZBPEqujV7yUVWxQ281HEru8oFq6psL5L1apZzOnYtqPUamFTozrJAOt12PkF8F5bPMy75hcuMN8d3j6NTl3u_YTR0cHQb28vRrhsQUaf8xswNw-pefiQgnQy3BBLx2U0qVqFVqsF2eiDmGXZ_IfQFrY0vKOTYplUBEamMhWhL3WaKkj8vit4sH6b77uZYf-OD_4CO_zNuw53vOAwoSptvyA_mQHw8tcrMKodPjzyWxe41-HOzWjPC9UNHOb7okaEnaDGP2FHTthsmsh07wn_sZQgMT3SUG0u9vZo4hEuB4nEyn_6w9SaaLCkGQrYVml5RqW0ZmckSceU_EgGv7pUVWxxMCT7m5LUDKyQj1-LjVpzeWGj2Kg3Z1YS7y1BI7oqHyu8NdmQ7ET_C1HBXLjhz-jsmHW6UzM97QB3rvjADcJjPyUClWvRa-xGNAvIIJaBtbIwbQNRlRihfUVrXNcpajafAXaYKuw?bgColor=!white)\n
-        \n```\n공칭 단위선단지지력\n\nArgs:\n    fISu (float): 선단근처 점성토의 비배수 전단강도\n\nReturns:\n\
+        \n```\n공칭 단위선단 지지력\n\nArgs:\n    fISu (float): 선단근처 점성토의 비배수 전단강도\n\nReturns:\n\
         \    fOqp (float): 교량 하부구조 설계기준 (한계상태설계법) 3.3.3.3(3) 공칭 단위선단지지력의 값\n```\n"
       tags:
       - kds
@@ -17184,6 +17184,285 @@ paths:
                 fIfya:
                   type: number
                   description: 앵커 강재의 설계기준항복강도
+      responses:
+        '200':
+          description: Success response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+      security:
+      - api_key: []
+  /kds/142010/040203_02_03/strength_reduction_factor_of_shear_force_and_torsion_moment:
+    post:
+      summary: 전단력과 비틀림모멘트의 강도감소계수
+      operationId: 
+        ruleunits.kds.142010.040203_02_03.KDS142010_040203_02_03.strength_reduction_factor_of_shear_force_and_torsion_moment
+      description: "\n\n![](https://mermaid.ink/img/pako:eNqrVkrOT0lVslJQislTAIK0nPzy5IzEohKFEBeISHFpUnpRYkGGQkBlSUZ-XrxzTmJxMUTKMToksyQn1UrhzYKW190rXi9Y-mrzHoXXO1vedje8Xrbn9aoVr1fOeNu1483cGQqvNkx93d_yasOEN209rza3vOmYEWsNMcUpOkbJ2yVYwdBEwchAwdBAwUTPSM9YQcNIU-HRxEUxSjB1jgp1dXUKThBOal5KTB6aA8MSizITk3JS41NS0yBSQBH_0hLDaP032-YAXfd6cwPQXjKdqw9zB5LVyEECdp2zBiHPaAL1lsSUOCvo6tqhuRgMgXIu1TFKBJwYo1QLdY0r0EJMx9oa6JmbQoIOZKIbyFlk-RrqYrApyK4FO98FTLqCSTeIc5R0FJRyU4tyEzNTgImqWqkkIzUXnLyAehJLc0qUamsBU2oTDQ?bgColor=!white)\n
+        \n```\n전단력과 비틀림모멘트의 강도감소계수\n\n\nReturns:\n    fOphi (float): 전단력과 비틀림모멘트의
+        강도감소계수\n```\n"
+      tags:
+      - kds
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties: {}
+      responses:
+        '200':
+          description: Success response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+      security:
+      - api_key: []
+  /kds/142022/041102_02/Nominal_shear_strength_for_reinforced_concrete_slabs_and_foundation_plates:
+    post:
+      summary: 철근콘크리트 슬래브와 기초판에 대한 공칭전단강도
+      operationId: 
+        ruleunits.kds.142022.041102_02.KDS142022_041102_02.Nominal_shear_strength_for_reinforced_concrete_slabs_and_foundation_plates
+      description: "\n\n![](https://mermaid.ink/img/pako:eNrFV-tuGkcYfZURPxpQau4Yxy2pEl9ix4ntXGSpYlO0BgwoXBxYp63QWnZFJMdGCq6KoRW4tLFrWyIStWmCFfJCzOw79NuZ3QV2MaloqiJ7-ZjLOee7zUDWFEyFwqZJZOKSCF5r8dS3wSifFtDjaTaS2ViNpPn1KFr-XoimkoGpOJ_JsKlb_scxIR6eROS81nnXJh_K0nYd_1GXdluI7NbxYRm38uTnLdRpNUhzR8oXSKmAcH5LKlZQ5-IvcvmG1HJ477TTKOJXuSdfMNjbfs60MP0IOdzIaUdOJ3JbHQ6rE5mdFs6kLrqFNjc30W32IZwMcUmd3BU-HeNX4-FAKLzGpmBkaUNw-G3kbQXXjvHFFtkpfyrxNlUYY3EaWPrwD-v4dZ5Uy31ApLoPGwbCuQxwmkIAwfuFzvty5yIHU7qNbsPGSk4qlYENnzVhYxnXdjqtFqk2ZSBS3pYOjgcCeQxAxSJ5W4R49LlGUaotcjjYj_Er_UBS5bSLSUPzrkZKzU5j2wjjHSxGyaTmCKnmEK43yV5FKkJ4akj27IcGLlR6eHsDQrdqfnUud5W4SK9egppO40edjolh0e0Dk2uHHO6TX85ACt79SYFUhdPM68BvGMBzR7IDvRSlAsmBMwf7uHEmO1xp49-gOhvb8Iei-CQvbbcRPjglB01ykgPSN1SVVjzdimZ6yOs2yx4LJb7UR95h_-eqSg0AAndJqd5PSWpFAnqLTVJsK-HQEdP807Ls5Z9Pys17-GJgH-g6VVbgZFFBSnt1ndWnifVBP5XTQPX7CxVPp5Qc7ZO9uuo2y2hfu5ca8jlxmScnIPLPBgz3c7n0XJ3zD_jXl70gxqacT7oNEv_vCplPevSa8NstOO4oaC1HzpvKadW_a9zgCeOoNqVyb1vTwhlUGN4rCwPhckGuMH1xrATxcVs5EaRiDeGiciAb4zwxOM4y4tGWkvCe466vX9Bn6o2gWS7NcmuWh15nyiGpjXo1a0KzbmiWw953tKoI0CVsCdSwarhUw93bTN0dHnV-XDW8qjGhOtRzyfZ-FaAgU-ahd7YFNgqcMIXGxm7qLmY20ztGF03D8-uZR7I5w5bII4tL8sAsG5gBhbN08R36nLsSbB5W3qXWwhUr7sGK--r-Ofggb1mAfzpBlyzS5xJ9LquBmM5ypi9jiQjKpIO-a1FBWM9M2mxxXgh_Z5W_WAVTkQwYCVvmecQaS_CR8FeIS0dTiOPi4WfIbrXbPddujhlenElUCnDGPyKDbwi4Wt2zI4Iz1C7OHf-_DYNruNC5EQiCgeyG6AvJFGsC8iOnh-Myz9JCljLb1gLZ4FNRHHPZ7coSM9WkTIAdi0QFZFGNJ1crlMsGofkRNAKXEBYhVU5Fm6JqCBcw3R2NKRgUfWanzWVhJMM5FkaJeErguPVMzNd1Brwzs7frTIFFtLHPw8Ipp_zeCALsVq-HldTTQDYD3kJybSHLN1kIsEdkMw6rY3it3R-BGOhWU6LPbVNLbMNut3vj61Fe1mFeDWRTIghhEuBc9HzM-8URRDyHAIsQ-zifWA3xLARMGIu4mh4z7QyQ8zERSyOIWKEiqBTqdWh423DCsnx1fJrfYPJNo-E-GEG8OXo9HsiGxGGRAeiHVPJ_-71XuTUHX1cP6PMhy5Lpc2RKhNMJPhaC3_FZkxANJ-gveljNb8QFkyj-DacXFy8?bgColor=!white)\n
+        \n```\n철근콘크리트 슬래브와 기초판에 대한 공칭전단강도\n\nArgs:\n    fIbo (float): 슬래브와 기초판에서 2방향
+        전단에 대한 위험단면의 둘레\n    fId (float): 종방향 인장철근의 중심에서 압축콘크리트 연단까지 거리\n    fIlambda
+        (float): 경량콘크리트계수\n    fIrho (float): 설계위험단면에서 양방향으로 각각 h만큼 떨어진 폭의 슬래브에 대한
+        평균주인장철근비\n    fIh (float): 부재의 전체 두께\n    fIld (float): 인장이형철근의 정착길이\n   \
+        \ fIalphas (float): 슬래브 또는 기초판에서 Vc를 계산할 때의 계수\n    fIfck (float): 설계기준 압축강도\n\
+        \nReturns:\n    fOVc (float): 철근콘크리트 슬래브와 기초판에 대한 공칭전단강도\n    fOsmalvc (float):
+        콘크리트 재료의 공칭전단응력강도\n    fOks (float): 슬래브의 두께계수\n    fOkbo (float): 위험단면 둘레길이의
+        영향계수\n    fOfte (float): 압축대 콘크리트의 인장강도\n    fOcotpsi (float): 압축대 콘크리트의 인장강도\n\
+        \    fOcu (float): 압축철근의 영향을 무시하고 계산된 슬래브 위험단면의 압축대 깊이의 평균값\n    fOfcc (float):
+        위험단면의 압축대에 작용하는 평균 압축응력\n    fOrho (float): 설계위험단면에서 양방향으로 각각 h만큼 떨어진 폭의 슬래브에
+        대한 평균주인장철근비\n    fOlemate (float): 설계위험단면에서 연장하여 슬래브에 정착해야하는 주인장철근의 길이\n \
+        \   pass_fail (bool): 콘크리트구조 전단 및 비틀림 설계기준  4.11.2 2방향 거동에 대한 전단강도 (2)의 판단
+        결과\n```\n"
+      tags:
+      - kds
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                fIbo:
+                  type: number
+                  description: 슬래브와 기초판에서 2방향 전단에 대한 위험단면의 둘레
+                fId:
+                  type: number
+                  description: 종방향 인장철근의 중심에서 압축콘크리트 연단까지 거리
+                fIlambda:
+                  type: number
+                  description: 경량콘크리트계수
+                fIrho:
+                  type: number
+                  description: 설계위험단면에서 양방향으로 각각 h만큼 떨어진 폭의 슬래브에 대한 평균주인장철근비
+                fIh:
+                  type: number
+                  description: 부재의 전체 두께
+                fIld:
+                  type: number
+                  description: 인장이형철근의 정착길이
+                fIalphas:
+                  type: number
+                  description: 슬래브 또는 기초판에서 Vc를 계산할 때의 계수
+                fIfck:
+                  type: number
+                  description: 설계기준 압축강도
+      responses:
+        '200':
+          description: Success response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+      security:
+      - api_key: []
+  /kds/142022/041103_02/Nominal_shear_strength_by_shear_reinforcement:
+    post:
+      summary: 전단철근에 의한 공칭전단강도
+      operationId: 
+        ruleunits.kds.142022.041103_02.KDS142022_041103_02.Nominal_shear_strength_by_shear_reinforcement
+      description: "\n\n![](https://mermaid.ink/img/pako:eNq1VF1rGkEU_SuXfWgSqBo39sU2KUZTKH1ooSEvWmSj6wesGtw1bRDFlA00UUiEbrKIiimaVmrARpMq2D-0M_sfOrvTxdVSSQudh2Fm7txzzr1z7-SZSCbKM15gQmkgIyZk3kYSXFaC7QA9EXO78Sy3l4BXB1Iikw77BU4UqckX3E5KAu8F3JJR-Qu-aWnfJ_jiDHBD1ZU6aINbPL6mRq2voFP5zWPquRkMMS8Cr8HtAXYVWBY8TrfbuQbL7EqIsS75oFgswibd8OloKD2naIfLJrldgQ9H-Rg1kZOXOckddOG7Omp10KCEP6h_oc9lcVMgdh4I1b6iqwn10CsVbTjE5frv8M0qrnV1RUUnHwlXlQDYgZ-nDYHNI7vAT0eo39XPOzBF0U-P9fNjQyc14foEXVpkgNQzAx2NZb1cMjRRv4YKWl_WbrqA3g-N3Yw2sicb1B3i1uGsInaBosYINztTBNyu4nKPKMQyUaMo-E7BP1T9sIeuevrJCPBF38jnuII_l0D71ifHs1xr_z_6WULPPKFeu5wlNMKS29pA1kZ93C7pyjUa3M6VhK0Cf5UZPLDqxKxU-rT0kGTU_t5T-5pl91hg9r4y7_mXF3bHCnGUQpIfHI6NuRaggAHi_iSZioOYjawvJSRpT_S6XAIn8e-cRrdHMnGRLFIucT_uTKa4OP8UYuG8WFhfdT4iiwOpsLTh-OOYNujWPxDtmEShWJaL5H3h_H7BZI4WyLSI1KKlsdujNtMQMOctc35mpO_eHU8TakTDPAQmxWdTXDJK_sM8IyX4lPkzEhIuJ0hMofATiJ9liA?bgColor=!white)\n
+        \n```\n전단철근에 의한 공칭전단강도\n\nArgs:\n    fIAv (float): 종방향 철근에 평행한 방향으로 전단 또는
+        비틀림철근의 간격 내의 전단철근의 단면적\n    fId (float): 종방향 인장철근의 중심에서 압축콘크리트 연단까지 거리\n \
+        \   fIs (float): 종방향 철근에 평행한 방향으로 전단 또는 비틀림철근의 간격\n    fIfyt (float): 횡방향
+        철근의 설계기준항복강도\n\n\nReturns:\n    fOVs (float): 전단철근에 의한 공칭전단강도\n    fOfs (float):
+        뚫림전단파괴시 전단철근에 작용하는 응력\n```\n"
+      tags:
+      - kds
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                fIAv:
+                  type: number
+                  description: 종방향 철근에 평행한 방향으로 전단 또는 비틀림철근의 간격 내의 전단철근의 단면적
+                fId:
+                  type: number
+                  description: 종방향 인장철근의 중심에서 압축콘크리트 연단까지 거리
+                fIs:
+                  type: number
+                  description: 종방향 철근에 평행한 방향으로 전단 또는 비틀림철근의 간격
+                fIfyt:
+                  type: number
+                  description: 횡방향 철근의 설계기준항복강도
+      responses:
+        '200':
+          description: Success response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+      security:
+      - api_key: []
+  /kds/142022/040101_01/shear_strength:
+    post:
+      summary: 전단강도
+      operationId: ruleunits.kds.142022.040101_01.KDS142022_040101_01.shear_strength
+      description: "\n\n![](https://mermaid.ink/img/pako:eNqdU1trE0EU_iuHfbAtNlk3zVN6kTZpQHywYOlLtoTpZrq7sJe4O_FC2NDCKlIV-xIaJUr6oFSJUKxVC_qHsrP_wbM7LqQJVOo8HGbOOd_5Zr5zpi1pboNKJZBUB3DtWu4jzSAeg82K8PitHd0jTQM2njDDdepli_i-CK3WNk1m0RLwQRi9OBmddqPX4faiCK7VVOlu5T4oRSjcgkIBinklr8CsMqdKWc4qdDodWBMH6jRUZ4Jzi3gm2bFovUF3RQg991pMqcn8ez8afIjO9vjzXgmQPvr0jb_rwejsnF98Gb-RnNEh9o6TQN8_nYYeHfKwj-gQnQKNOZehhSnoRRi_PR6dD_mzVwg94cenyRWiz1ixFx_8jN90o5d7oublUguTpfjvXrw_jD4OEYZ3AawTd_vXeFdxqmKayr8ORj9-Xbdi2osxudM-Cfngxl8xss1Ctilm7RuflBRZnr1qGOYQx1RWhlxuZaLjIjLuS5MqqV1PbTXLqiDHkmnr4Hva8ozBWNMvybJFGH2cT4Zcc3UfN7bsP9Tzpk10ehu26m0nWEarBTfR-sHMSu6qJUY3YVtv_xdbK1BViz4AVW0apqD_J2WwmD2xmui4kajqelAlpiXUSzSX5kGyqWcTs4G_uS0xg9rpv0bNSMtiUhD8AaN8l2k?bgColor=!white)\n\
+        \n```\n전단강도\n\nArgs:\n    fIVu (float): 단면에서 계수전단력\n    fIphi (float): 강도감소계수\n\
+        \    fIVc (float): 콘크리트에 의한 단면의 공칭전단강도\n    fIVs (float): 전단철근에 의한 단면의 공칭전단강도\n\
+        \n\nReturns:\n    fOVn (float): 단면의 공칭전단강도\n    pass_fail (bool): 콘크리트구조 전단
+        및 비틀림 설계기준  4.1.1 전단강도 (1)의 판단 결과\n```\n"
+      tags:
+      - kds
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                fIVu:
+                  type: number
+                  description: 단면에서 계수전단력
+                fIphi:
+                  type: number
+                  description: 강도감소계수
+                fIVc:
+                  type: number
+                  description: 콘크리트에 의한 단면의 공칭전단강도
+                fIVs:
+                  type: number
+                  description: 전단철근에 의한 단면의 공칭전단강도
+      responses:
+        '200':
+          description: Success response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+      security:
+      - api_key: []
+  /kds/142022/041102_05/Nominal_shear_strength_by_concrete:
+    post:
+      summary: 콘크리트에 의한 공칭전단강도
+      operationId: 
+        ruleunits.kds.142022.041102_05.KDS142022_041102_05.Nominal_shear_strength_by_concrete
+      description: "\n\n![](https://mermaid.ink/img/pako:eNqVk99r01AUx_-Vw31wG9h0jR1Ip5Ot9UF8ETb20oySpmkbTNrZpP4gpHQSoXaFdUJchHbkYRMHFYKtrgP9h3Jv_gdvcq3WVUTvQ8g9937P-Zwf10RSvSSjDCChBnSV1fozqSo2DNjJMYveLFYa4n4VHr0wqvVaIauKus6ONvM7iqHKGSDf3PBghN-Pwu6UnPSBDN3QGUAw_kyuPhLPxocfAt_BR_beOlNu5QX0MLcNqTTwq8DzkOZSKY6H5bUVAc0ubUKr1YIttpFrJaF2jWhXbChiUZULJbnMjqjlQS2VT5LTV9g7x-M26bj_gZechY798At-7LNgbAdTn5y1gTgO-eL8SXdrQdcd4VMXT3vkXRsi-aQT9vqUhNgD4LF_Eb49B8YR4eFeO8IjAzs8cakNX0woMeBjF3ud30OlF0LFVOSTF1x-jUTEPaDOydAGPJqQw0HouMHYo6nb5KWP-4NfbAvxmCsKA8FVlwxjW3j0Orj0Av_NT4y5vrDiw40f1Yu7xwoys6VnV-dnKb6XXf7rRKxQoSEYWUgkNq61nTnMmQK6o2gV0BvS3aWqYezrmWRSFQ35ORdNuFSv6PRHS-pPK5yiiRX5HuwWTMkSBFV-Aqvc2u0y3T62igWzbkkFs2ktbSQWloCs9ShkBDOPEXPl4u_9KJN_njiWW5QBuglIkxuaqJToczSRUZW1-GFS92JTNZBlfQdKrqct?bgColor=!white)\n
+        \n```\n콘크리트에 의한 공칭전단강도\n\nArgs:\n    fIVc (float): 콘크리트에 의한 공칭전단강도\n    fIfck
+        (float): 설계기준 압축강도\n    fIbo (float): 슬래브와 기초판에서 2방향 전단에 대한 위험단면의 둘레\n   \
+        \ fIcu (float): 압축철근의 영향을 무시하고 계산된 슬래브 위험단면의 압축대 깊이의 평균값\n\n\nReturns:\n \
+        \   fOVc (float): 콘크리트에 의한 공칭전단강도\n```\n"
+      tags:
+      - kds
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                fIVc:
+                  type: number
+                  description: 콘크리트에 의한 공칭전단강도
+                fIfck:
+                  type: number
+                  description: 설계기준 압축강도
+                fIbo:
+                  type: number
+                  description: 슬래브와 기초판에서 2방향 전단에 대한 위험단면의 둘레
+                fIcu:
+                  type: number
+                  description: 압축철근의 영향을 무시하고 계산된 슬래브 위험단면의 압축대 깊이의 평균값
+      responses:
+        '200':
+          description: Success response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+      security:
+      - api_key: []
+  /kds/142022/041103_01/Shear_reinforcement_conditions:
+    post:
+      summary: 전단철근 배근 조건
+      operationId: 
+        ruleunits.kds.142022.041103_01.KDS142022_041103_01.Shear_reinforcement_conditions
+      description: "\n\n![](https://mermaid.ink/img/pako:eNp9kk1LAkEYx7_Kw5wU8mXNOhgEvgXRRUi6uCGju6awrrGuVIhioFDZoQ6mhxSL1AIPa0UZ1Jfp6D5-h3Z3EkSjOcwwz8v8_v_hKZJkThCJDwgvg7FSUu4omaaKCtEQi-QLiQOFHqYhcqKmc3I8KNF8nqX8sWhGlUQfYLeq1x_xuTt5_wRd08wD77TJ6HV_g5UGYjzZCe0C5wWPGzwe8Do5zrkKNs7Ok1mRH8rlMgTYRZQFXl6QsEeVDE1IYlwQUyxlRLZlLubCTk3v9vSXCp61DD33NV17mt70ANtj7PSYMmy3AB-usT7E5hVWbwEbDXxr4FdrejrU-8PpxRiwqRlOJh-XOKjAZKQZYddMnsXyLLHmvFuEQUXvV62mJSPzX2h5Ddr-_Re70ajyahAcjs0F8-zBUJEnAnyf94BbcwOVBWC3v0XBMXDrPCn9-gmb8IgpJafAFs1IJtGSbULncRY_ZO1h1ktWgGRFJUszgjE8RaKmxaw1RkY1LUgqKZV-AFcV9hY?bgColor=!white)\n
+        \n```\n전단철근 배근 조건\n\nArgs:\n    fId (float): 종방향 인장철근의 중심에서 압축콘크리트 연단까지 거리\n\
+        \    fIdishre (float): 전단철근의 지름\n\nReturns:\n    pass_fail (bool): 콘크리트구조
+        전단 및 비틀림 설계기준  4.11.3 전단철근 (1)의 판단 결과\n```\n"
+      tags:
+      - kds
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                fId:
+                  type: number
+                  description: 종방향 인장철근의 중심에서 압축콘크리트 연단까지 거리
+                fIdishre:
+                  type: number
+                  description: 전단철근의 지름
+      responses:
+        '200':
+          description: Success response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+      security:
+      - api_key: []
+  /kds/142022/040201_01_01/Shear_strength_of_a_member_subjected_to_shear_force_and_bending_moment_only:
+    post:
+      summary: 전단력과 휨모멘트만을 받는 부재의 전단강도
+      operationId: 
+        ruleunits.kds.142022.040201_01_01.KDS142022_040201_01_01.Shear_strength_of_a_member_subjected_to_shear_force_and_bending_moment_only
+      description: "\n\n![](https://mermaid.ink/img/pako:eNqVU99r01AU_lcOeXAb2NZ2xYfqJlu7gfig4NhLr5S0SX9g0s7k1ikhpUIGug3mwLqibS3Suk4qxBVrhe2f8TH39n_wJneBtIpiHi4353zf-fGdcw0hV5FkIQECKgP78kplN1cUNQxbKW7Rq9mCJu4U4cFzXKyUM0lF1HXuWktvlbAiJ4B2LXIwIN2-M7qAaWtAPg_IWXO6PyGnh7RtAbHfk_03QMZ12hnSdvOK4NgNcmQ9usWjraeRcC_1EKJxiN2AWAzi4Vg4CovRJfh53EWCj1uDWq0G6_xHLkuoPFfotqiVxKwiZyQ5z13Mcr-Ko-kIHbdYlWRUpy-biZkqIn54hr1bdqGdvQDUOb8kH17Ry-b0xZB8GrLWnJHFPLO02DwtSPD6tnqM50xs2qvTRoOOG3_Kvjwfhoy-udqxANOjL7PY-G8pP-4R-2z6tg-0PaGdPj3vOt8vvOS9Y3owpCevqdUCnj1YH9AT25XjxyE9rYPz1WZmL9eMhp74XCO4dtW1f1n2L3GfFBhPcH28IMnFfw18iXExwkkIhVbnpso9QZsHSnnnhndu-qiUgYT_3lA2cPrORoLJq99gtd4uqQXQtdzKQhHjHT0RiSgilp-F3ReUqxR0dlEj-tNCuKSKBfkObGeMnLmC8pqYM6KmcdNESBHVrCQCQvoTDRt5BnhsmtmMsWtKC6uhv318_3lDm65yweXlWrl1CtdBUGVNFUsSe9SGgIuy6j1vppBYVbBgmr8ARa27lw?bgColor=!white)\n
+        \n```\n전단력과 휨모멘트만을 받는 부재의 전단강도\n\nArgs:\n    fIlambda (float): 경량콘크리트계수\n\
+        \    fIfck (float): 콘크리트의 설계기준압축강도\n    fIbw (float): 복부의 폭\n    fId (float):
+        종방향 인장철근의 중심에서 압축콘크리트 연단까지 거리\n\n\nReturns:\n    fOVc (float): 전단강도\n```\n"
+      tags:
+      - kds
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                fIlambda:
+                  type: number
+                  description: 경량콘크리트계수
+                fIfck:
+                  type: number
+                  description: 콘크리트의 설계기준압축강도
+                fIbw:
+                  type: number
+                  description: 복부의 폭
+                fId:
+                  type: number
+                  description: 종방향 인장철근의 중심에서 압축콘크리트 연단까지 거리
       responses:
         '200':
           description: Success response

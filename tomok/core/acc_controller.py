@@ -263,16 +263,28 @@ class ACCEngine:
                 "08": " ⑧",
                 "09": " ⑨",
             }
-            template = "KRPset_{} {} {} {}_{} ({})"
             temp = rule_code.split("_")
-            code = template.format(
-                temp[0][:3],
-                temp[0][3:5],
-                temp[0][5:7],
-                temp[0][7:],
-                f"{temp[1][1]}.{temp[1][3]}.{temp[1][5]}.{temp[1][7]}",
-                temp[2][-1],
-            )
+            template = "KRPset_{} {} {} {}_{} ({})"
+            if len(temp[1]) > 6:
+                code = template.format(
+                    temp[0][:3],
+                    temp[0][3:5],
+                    temp[0][5:7],
+                    temp[0][7:],
+                    f"{temp[1][1]}.{temp[1][3]}.{temp[1][5]}.{temp[1][7]}",
+                    temp[2][-1],
+                )
+            else:
+                middle = [temp[1][i : i + 2] for i in range(0, len(temp[1]), 2)]
+                middle = [str(int(x)) for x in middle]
+                code = template.format(
+                    temp[0][:3],
+                    temp[0][3:5],
+                    temp[0][5:7],
+                    temp[0][7:],
+                    ".".join(middle),
+                    temp[2][-1],
+                )
             if len(temp) == 4:
                 code += replacements[temp[-1]]
             return code
@@ -401,7 +413,8 @@ class ACCController:
                         for code in order:
                             ccc_result["log"].append(f"룰유닛 {code} 실행")
                             try:
-                                print("enter try")
+                                ccc_result["log"].append("enter try")  # logging
+
                                 input_value = self.engine.get_input_values(entity, code)
                                 ccc_result["log"].append(f"입력 변수: {input_value}")
                                 path = self.engine.get_api_path(code)
