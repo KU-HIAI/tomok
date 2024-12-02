@@ -43,9 +43,43 @@ class Product(SupertypeIfcEntityOfPsetAndProp):
 
     def get_subtype(self):
         # test
-        if "PredefinedType" in self.entity:
-            print("predefined:", self.entity.PredefinedType)
-        return self.entity.ObjectType
+        valid_obj_types_bridge = [
+            "SEISMIC_GRADE_SETTING",
+            "SEISMIC_ANALYSIS_METHOD",
+            "PSC_I_GIRDER",
+            "CONTINUOUS_DECK",
+            "SUBSTRUCTURE_CHECK",
+            "SHOE_DESIGN",
+            "STEEL_PLATE_GIRDER",
+            "JOINT",
+            "STEEL_CROSSBEAM",
+            "SERVICEABILITY_CHECK",
+            "STIFFENING_GIRDER",
+        ]
+        valid_obj_type_building = [
+            "SEISMIC_CATEGORY",
+            "EARTHQUAKE_RESISTANCE_SYSTEM",
+            "BASEMENT_STRUCTURE_SEISMIC_DESIGN",
+            "RC_JOINT",
+            "DECKPLATE_SLAB",
+            "STEEL_BEAM",
+            "STEEL_COLUMN",
+            "STEEL_JOINT",
+            "GENERAL_CONCEPT",
+            "SIMPLE_METHOD",
+            "STRUCTURAL_STABILITY",
+            "STRUCTURAL_PERFORMANCE_EVALUATION",
+            "JOINT",
+        ]
+        valid_obj_type = valid_obj_type_building + valid_obj_types_bridge
+
+        if self.entity.ObjectType in valid_obj_type:
+            return self.entity.ObjectType
+        else:
+            if "PredefinedType" in self.entity.__dict__:
+                return self.entity.PredefinedType
+            else:
+                return self.entity.ObjectType
 
     def get_upper_subtype(self):
         return self.get_subtype().upper() if isinstance(self.get_subtype(), str) else ""
