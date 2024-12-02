@@ -44,7 +44,7 @@ class RuleUnitCallingDescriptor:
                 }
             )
 
-    def convert_code_format(code):
+    def convert_code_format(self, code):
         replacements = {
             "①": "_01",
             "②": "_02",
@@ -62,11 +62,9 @@ class RuleUnitCallingDescriptor:
         middle = ""
         for x in parts[1]:
             if len(x) > 1:
-               middle += x
+                middle += x
             else:
-                middle += "0" + x 
-        # parts[1] = parts[1].replace(".", "")
-        # middle = "".join(["0" + char for char in parts[1]])
+                middle += "0" + x
         suffix = "0" + parts[2][1]
         if any(key in code for key in replacements):
             suffix += replacements[code[-1]]
