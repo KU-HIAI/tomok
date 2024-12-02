@@ -25,7 +25,7 @@ class TableUnitController:
             cls._instance = super(TableUnitController, cls).__new__(cls)
         return cls._instance
 
-    def __init__(self, TF_REPO_TOKEN, path=TF_REPO_ID, mode="github"):
+    def __init__(self, TF_REPO_TOKEN, path=TF_REPO_ID, mode="github", verbose=False):
         if "initialized" not in self.__dict__:
             if mode == "github":
                 prepare_tf_repo(True, TF_REPO_TOKEN)
@@ -40,6 +40,8 @@ class TableUnitController:
             if mode in ["local", "github"]:
                 for curpath, subdirs, filenames in os.walk(path):
                     for filename in filenames:
+                        if verbose:
+                            print(f"READ {filename}")
                         if filename.endswith(".py"):
                             code = open(
                                 os.path.join(curpath, filename), encoding="utf-8"
@@ -56,9 +58,13 @@ class TableUnitController:
                                             .lstrip("./")
                                             .replace(os.path.sep, ".")[:-3]
                                         )
+                                        if verbose:
+                                            print(f"IMPORT {import_name}")
                                         tableunit = getattr(
                                             import_module(import_name), cls_name
                                         )()
+                                        if verbose:
+                                            print(tableunit)
                                         tableunit.filename = filename
                                         tableunit.filepath = os.path.join(
                                             curpath, filename
