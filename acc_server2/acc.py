@@ -124,8 +124,8 @@ def verify_module(user, *args, **kwargs) -> Dict:
     for idx, result_entity in enumerate(results):
         flag = True
         input_values = {}
-        for ccc_results in result_entity["result"]["ccc_results"]:
-            if "False" in ccc_results["log"][-1]:
+        for ccc_results in result_entity["ccc_results"]:
+            if "False" in ccc_results["log"][-1] or "Error" in ccc_results["log"][-1]:
                 flag = False
             ccc_input_values = [
                 eval(x.replace("입력 변수: ", ""))

@@ -403,18 +403,21 @@ class ACCController:
         execution_orders = self.engine.execution_orders[module_index]
 
         for entity_index, entity in enumerate(self.entities):
-            entity_result = {"index": entity_index, "result": {"ccc_results": []}}
+            entity_result = {
+                "index": entity_index,
+                "entity": entity,
+                "ccc_results": [],
+                "api_results": {},
+            }
             self.engine.current_entity = entity  # 엔진에 현재 엔티티를 설정
 
             for order_index, order in enumerate(execution_orders):
-                ccc_result = {"ccc_index": order_index, "log": []}
+                ccc_result = {"index": order_index, "log": []}
                 if isinstance(order, list):
                     while True:
                         for code in order:
-                            ccc_result["log"].append(f"룰유닛 {code} 실행")
+                            ccc_result["log"].append(f"룰유닛 [{code}] 실행")
                             try:
-                                ccc_result["log"].append("enter try")  # logging
-
                                 input_value = self.engine.get_input_values(entity, code)
                                 ccc_result["log"].append(f"입력 변수: {input_value}")
                                 path = self.engine.get_api_path(code)
@@ -422,6 +425,7 @@ class ACCController:
                                 for k, v in result.items():
                                     self.engine.var_cache[k] = v
                                 ccc_result["log"].append(f"API 반환 결과: {result}")
+                                entity_result["api_results"][code] = result
                             except Exception as e:
                                 ccc_result["log"].append(
                                     f"Error executing code {code}: {e}"
@@ -441,9 +445,10 @@ class ACCController:
                         for k, v in result.items():
                             self.engine.var_cache[k] = v
                         ccc_result["log"].append(f"API 반환 결과: {result}")
+                        entity_result["api_results"][code] = result
                     except Exception as e:
                         ccc_result["log"].append(f"Error executing code {code}: {e}")
-                entity_result["result"]["ccc_results"].append(ccc_result)
+                entity_result["ccc_results"].append(ccc_result)
             results.append(entity_result)
         return results
 
