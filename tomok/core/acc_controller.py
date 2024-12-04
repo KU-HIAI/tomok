@@ -405,7 +405,6 @@ class ACCController:
         for entity_index, entity in enumerate(self.entities):
             entity_result = {
                 "index": entity_index,
-                "entity": entity,
                 "ccc_results": [],
                 "api_results": {},
             }
