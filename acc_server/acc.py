@@ -19,8 +19,8 @@ from tomok import IFCReader, RuleIFCController, RuleUnitController, ACCControlle
 
 logger = logging.getLogger(__name__)
 ifc_path = "uploads/"
-temp_files = "./temp_files"
-module_file_path = "./temp_files/modules"
+temp_files = "./library_files"
+module_file_path = "./library_files/modules"
 os.makedirs(ifc_path, exist_ok=True)
 CRYPT = ContextVar("crypt", default=None)
 RIC = ContextVar("RuleIFCController", default=None)
@@ -35,7 +35,7 @@ def acc_init(app):
     ac = ACCController(
         resource_path=temp_files,
         module_file_path=module_file_path,
-        rule_file="tree_temp2.csv",
+        rule_file="io_variables.csv",
     )
     AC.set(ac)
 
