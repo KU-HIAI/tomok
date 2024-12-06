@@ -203,7 +203,7 @@ class ACCEngine:
         rule_file,
         resource_path,
         module_file_path,
-        openapi_file="/mnt/raid6/jaewook133/tomok/acc_server2/openapi/tomok-api.yaml",  # 보안 위해 수정 필요
+        openapi_url="https://tomokapi.hiai.kr/v1.0/openapi.json",  # 추후 이관 시 수정 필요
     ):
         self.var_cache = {"pass_fail": 0}
         self.openapi_spec = None
@@ -219,7 +219,7 @@ class ACCEngine:
         self.execution_orders = [
             result["execution_orders"] for result in self.rule_unit_descriptor.results
         ]
-        self.load_openapi_spec(openapi_file)
+        self.openapi_spec = self.load_openapi_spec(openapi_url)
 
         self.module_names = [
             f.split("_")[-1].replace(".csv", "")
@@ -227,9 +227,17 @@ class ACCEngine:
             if f.endswith(".csv")
         ]
 
-    def load_openapi_spec(self, openapi_file):
-        with open(openapi_file, "r") as fp:
-            self.openapi_spec = yaml.safe_load(fp)
+    def load_openapi_spec(self, openapi_url):
+        import requests
+
+        try:
+            response = requests.get(openapi_url)
+            response.raise_for_status()
+            openapi_spec = response.json()
+            return openapi_spec
+        except requests.exceptions.RequestException as e:
+            print(f"Error fetching OpenAPI spec: {e}")
+            return {}
 
     def get_api_path(self, code):
         temp = "/".join([code[:3].lower(), code[3:9], code[10:]])
