@@ -18,9 +18,9 @@ from tomok import IFCReader, RuleIFCController, RuleUnitController, ACCControlle
 
 
 logger = logging.getLogger(__name__)
-ifc_path = "uploads/"
-temp_files = "./library_files"
-module_file_path = "./library_files/modules"
+ifc_path = os.getenv('IFC_PATH', 'uploads/')
+temp_files = os.getenv('LIBRARY_PATH', './library_files')
+module_file_path = os.path.join(temp_files, 'modules')
 os.makedirs(ifc_path, exist_ok=True)
 CRYPT = ContextVar("crypt", default=None)
 RIC = ContextVar("RuleIFCController", default=None)
