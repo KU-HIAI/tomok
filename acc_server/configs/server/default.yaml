@@ -2,11 +2,11 @@ _target_: server.connexion_aiohttp.ConnexionAioHttpApp
 
 # app server network
 app_host: '0.0.0.0'
-app_port: 51080
+app_port: ${oc.env:PORT}
 
 # api
-specification_dir: openapi
-api_files: ['tomok-demo.yaml']
+specification_dir: ${oc.env:SPECIFICATION_DIR}
+api_files: ['${oc.env:API_FILE}']
 api_secret: 'kDiWQ_idJ8NCKy_sD3p_0hA5ifoewFJRa0WzfzxRVhc='
 client_max_size: 524288000 # 500MB
 rule_ifc_dir: 'ruleifc/'

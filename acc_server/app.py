@@ -24,6 +24,7 @@ def launch_server(config):
 
 @hydra.main(config_path="configs/", config_name="serve.yaml", version_base="1.1")
 def hydra_entry(config: DictConfig):
+    config.server.app_port = int(config.server.app_port)
     if config.work_dir not in sys.path:
         sys.path.append(config.work_dir)  # for vscode debug
     # Pretty print config using Rich library
