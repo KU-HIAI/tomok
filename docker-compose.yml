@@ -1,33 +1,20 @@
-# - OPENAPI_URL=http://localhost:51032/v1.0/openapi.json
-
-
-version: "3.8"
+version: '3.8'
 
 services:
-  acc_server:
+  base:
     build:
       context: .
-      dockerfile: acc_server/Dockerfile
-    ports:
-      - "51080:51080"
-    environment:
-      PORT: 51080
-      LIBRARY_PATH: /usr/src/app/acc_server/library_files
-      IFC_PATH: /usr/src/app/acc_server/uploads
-      SPECIFICATION_DIR: /usr/src/app/acc_server/openapi
-      API_FILE: tomok-demo.yaml
-      OPENAPI_URL: https://tomokapi.hiai.kr/v1.0/openapi.json
+      dockerfile: Dockerfile
+    image: tomok-base:latest
+  api:
+    build:
+      context: ./api_server
+      dockerfile: Dockerfile
+    depends_on:
+      - base
     volumes:
-      - ./acc_server/library_files:/usr/src/app/acc_server/library_files
-      - ./acc_server/uploads:/usr/src/app/acc_server/uploads
-      - ./acc_server/openapi:/usr/src/app/acc_server/openapi
-  # api_server:
-  #   build:
-  #     context: .
-  #     dockerfile: api_server/Dockerfile
-  #   ports:
-  #     - "51032:51032"
-  #   environment:
-  #     - PORT=51032
-  #   volumes:
-  #     - ./api_server:/usr/src/app/api_server
+      - ../tomok_assets/ruleunits:/app/api_server/ruleunits
+    ports:
+      - "51515:51515"
+    environment:
+      - PORT=51515

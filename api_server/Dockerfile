@@ -1,19 +1,11 @@
-# Use the miniconda base image
-FROM continuumio/miniconda3:24.9.2-0
+FROM tomok-base:latest
 
-WORKDIR /usr/src/app
+WORKDIR /app/api_server
 
-# Copy the entire project directory (to access pyproject.toml)
-COPY ../ /usr/src/app/
-
-# Create and activate the conda environment, and install dependencies
-RUN conda env create -f /usr/src/app/api_server/environment_20241209.yml && \
-    echo "source activate tomok_env" > ~/.bashrc && \
-    /bin/bash -c "source /opt/conda/etc/profile.d/conda.sh && conda activate tomok_env" && \
-    pip install .
+COPY . /app/api_server
 
 # Make entrypoint.sh executable
-RUN chmod +x /usr/src/app/api_server/entrypoint.sh
+RUN chmod +x /app/api_server/entrypoint.sh
 
 # Execute the needed applications with the necessary commands
-ENTRYPOINT ["/bin/bash", "/usr/src/app/api_server/entrypoint.sh"]
+ENTRYPOINT ["/bin/bash", "/app/api_server/entrypoint.sh"]

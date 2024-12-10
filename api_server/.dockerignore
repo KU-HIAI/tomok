@@ -1,0 +1,5 @@
+uploads
+__pycache__
+logs
+ruleunits
+*.ipynb
