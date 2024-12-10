@@ -4,7 +4,8 @@ FROM continuumio/miniconda3:24.9.2-0
 WORKDIR /usr/src/app
 
 # Copy the entire project directory (to access pyproject.toml)
-COPY ../ /usr/src/app/
+COPY api_server /usr/src/app/api_server
+COPY api_server/environment_20241209.yml /usr/src/app/api_server/environment_20241209.yml
 
 # Create and activate the conda environment, and install dependencies
 RUN conda env create -f /usr/src/app/api_server/environment_20241209.yml && \

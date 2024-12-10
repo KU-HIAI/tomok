@@ -9,25 +9,27 @@ services:
       context: .
       dockerfile: acc_server/Dockerfile
     ports:
-      - "51080:51080"
+      - "51076:51076"
     environment:
-      PORT: 51080
+      PORT: 51076
       LIBRARY_PATH: /usr/src/app/acc_server/library_files
       IFC_PATH: /usr/src/app/acc_server/uploads
       SPECIFICATION_DIR: /usr/src/app/acc_server/openapi
       API_FILE: tomok-demo.yaml
-      OPENAPI_URL: https://tomokapi.hiai.kr/v1.0/openapi.json
+      # OPENAPI_URL: https://tomokapi.hiai.kr/v1.0/openapi.json
+      OPENAPI_URL: https://localhost:51032/v1.0/openapi.json
     volumes:
       - ./acc_server/library_files:/usr/src/app/acc_server/library_files
       - ./acc_server/uploads:/usr/src/app/acc_server/uploads
       - ./acc_server/openapi:/usr/src/app/acc_server/openapi
-  # api_server:
-  #   build:
-  #     context: .
-  #     dockerfile: api_server/Dockerfile
-  #   ports:
-  #     - "51032:51032"
-  #   environment:
-  #     - PORT=51032
-  #   volumes:
-  #     - ./api_server:/usr/src/app/api_server
+
+  api_server:
+    build:
+      context: .
+      dockerfile: api_server/Dockerfile
+    ports:
+      - "51030:51030"
+    environment:
+      PORT: 51030
+    volumes:
+      - ./api_server:/usr/src/app/api_server
