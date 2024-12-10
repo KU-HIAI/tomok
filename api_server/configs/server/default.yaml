@@ -2,7 +2,7 @@ _target_: server.connexion_aiohttp.ConnexionAioHttpApp
 
 # app server network
 app_host: '0.0.0.0'
-app_port: 51032
+app_port: ${oc.env:PORT}
 
 # api
 specification_dir: openapi

@@ -9,5 +9,5 @@ dependencies:
   - pip
   - pip:
       - psycopg2-binary
-      - ..
+      - .
       - -r requirements.txt
