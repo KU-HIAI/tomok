@@ -15,6 +15,26 @@ services:
     volumes:
       - ../tomok_assets/ruleunits:/app/api_server/ruleunits
     ports:
-      - "51515:51515"
+      - "51083:51083"
     environment:
-      - PORT=51515
+      - PORT=51083
+  acc:
+    build:
+      context: ./acc_server
+      dockerfile: Dockerfile
+    depends_on:
+      - base
+      - api
+    volumes:
+      - ./acc_server/openapi:/app/acc_server/openapi
+      - ./acc_server/library_files:/app/acc_server/library_files
+      - ./acc_server/uploads:/app/acc_server/uploads
+    ports:
+      - "51076:51076"
+    environment:
+      - PORT=51076
+      - LIBRARY_PATH=/app/acc_server/library_files
+      - IFC_PATH=/app/acc_server/uploads
+      - SPECIFICATION_DIR=/app/acc_server/openapi
+      - API_FILE=tomok-demo.yaml
+      - RULEUNIT_API_URL=http://localhost:51083/v1.0

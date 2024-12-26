@@ -297,7 +297,7 @@ class ImageUnit(BaseUnit):
                     raise
             print("\033[92m" + "[통과]" + "\033[0m" + " 극단적 입력값 테스트 완료")
 
-            print("\033[1m[Byte64로 저장된 이미지 출력]\033[0m")
+            print("\033[1m[Base64로 저장된 이미지 출력]\033[0m")
             self.render_image()
             # 이미지 출력
 
