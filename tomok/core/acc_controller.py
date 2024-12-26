@@ -2,7 +2,9 @@ import os
 from os.path import join
 import json
 import yaml
+import socket
 import requests
+import urllib.parse
 from collections import defaultdict, deque
 import pandas as pd
 from typing import List, Dict, Any
@@ -203,10 +205,27 @@ class ACCEngine:
         rule_file,
         resource_path,
         module_file_path,
-        openapi_url="https://tomokapi.hiai.kr/v1.0/openapi.json",  # 추후 이관 시 수정 필요
+        ruleunit_api_url="https://tomokapi.hiai.kr/v1.0",
     ):
         self.var_cache = {"pass_fail": 0}
         self.openapi_spec = None
+        
+        def build_new_local_ip_url():
+            s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+            s.connect(('8.8.8.8', 80))
+            ip = s.getsockname()[0]
+            s.close()
+            parsed_url = urllib.parse.urlparse(ruleunit_api_url)
+            port = parsed_url.port
+            return f"http://{ip}:{port}/v1.0"
+        
+        # 로컬 IP 계산해서 새로운 주소 생성
+        if False:
+            self.ruleunit_api_url = build_new_local_ip_url()
+        else:
+            self.ruleunit_api_url = "https://tomokapi.hiai.kr/v1.0/"
+            
+        self.openapi_url = join(self.ruleunit_api_url, "openapi.json")
         rule_file_path = join(resource_path, rule_file)
         module_files = [
             join(module_file_path, f)
@@ -219,13 +238,14 @@ class ACCEngine:
         self.execution_orders = [
             result["execution_orders"] for result in self.rule_unit_descriptor.results
         ]
-        self.openapi_spec = self.load_openapi_spec(openapi_url)
+        self.openapi_spec = self.load_openapi_spec(self.openapi_url)
 
         self.module_names = [
             f.split("_")[-1].replace(".csv", "")
             for f in sorted(os.listdir(module_file_path))
             if f.endswith(".csv")
         ]
+        self.ruleunit_api_url = ruleunit_api_url
 
     def load_openapi_spec(self, openapi_url):
         import requests
@@ -320,7 +340,7 @@ class ACCEngine:
 
     def ruleunit_call(self, path: str, **kwargs):
         key = "f234cf784e7c9669929122343a808bcf9607e425"
-        base_uri = "http://tomokapi.hiai.kr/v1.0"
+        base_uri = self.ruleunit_api_url if self.ruleunit_api_url else "http://tomokapi.hiai.kr/v1.0"
         headers = {"X-Auth": key}
         api_uri = base_uri + path
         response = requests.post(api_uri, headers=headers, data=kwargs)
@@ -363,6 +383,7 @@ class ACCController:
         resource_path,
         module_file_path,
         rule_file="tree_temp2.csv",
+        ruleunit_api_url="https://tomokapi.hiai.kr/v1.0",
     ):
         self.rule_file = rule_file
         self.reader = None
@@ -373,6 +394,7 @@ class ACCController:
             rule_file=self.rule_file,
             resource_path=resource_path,
             module_file_path=module_file_path,
+            ruleunit_api_url=ruleunit_api_url,
         )
         self.log = []
 

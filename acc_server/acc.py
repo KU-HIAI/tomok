@@ -7,6 +7,7 @@ from copy import deepcopy
 import os
 import json
 import random
+from os.path import join
 
 # 3rd-party
 import numpy as np
@@ -20,6 +21,7 @@ from tomok import IFCReader, RuleIFCController, RuleUnitController, ACCControlle
 logger = logging.getLogger(__name__)
 ifc_path = os.getenv('IFC_PATH', 'uploads/')
 temp_files = os.getenv('LIBRARY_PATH', './library_files')
+RULEUNIT_API_URL = os.getenv('RULEUNIT_API_URL', 'http://tomokapi.hiai.kr/v1.0')
 module_file_path = os.path.join(temp_files, 'modules')
 os.makedirs(ifc_path, exist_ok=True)
 CRYPT = ContextVar("crypt", default=None)
@@ -36,6 +38,7 @@ def acc_init(app):
         resource_path=temp_files,
         module_file_path=module_file_path,
         rule_file="io_variables.csv",
+        ruleunit_api_url=RULEUNIT_API_URL,
     )
     AC.set(ac)
 
@@ -46,7 +49,7 @@ def upload(user, *args, **kwargs) -> Dict:
     token_dict = crypt.file_to_token(kwargs["ifcfile"].filename, expired_days=1.0)
     token = token_dict["token"]
     expired_datetime = token_dict["expired_datetime"]
-    filepath = to_absolute_path(ifc_path + token)
+    filepath = to_absolute_path(join(ifc_path, token))
     # write ifc file
     with open(filepath, "wb") as fp:
         fp.write(kwargs["ifcfile"].file.read())
@@ -91,7 +94,7 @@ def verify(user, *args, **kwargs) -> Dict:
     rule_index = kwargs["body"]["ruleid"]
     guid = kwargs["body"]["guid"]
 
-    filepath = to_absolute_path(ifc_path + token)
+    filepath = to_absolute_path(join(ifc_path, token))
     reader = IFCReader(filepath)
 
     results, results_str = ric.verify(reader, rule_index, guid, return_results=True)
@@ -111,7 +114,7 @@ def verify_module(user, *args, **kwargs) -> Dict:
     module_index = kwargs["body"]["module_index"]
     subtype = kwargs["body"]["subtype"]
 
-    filepath = to_absolute_path(ifc_path + token)
+    filepath = to_absolute_path(join(ifc_path, token))
 
     # ACC
     ac.load_ifc_file(filepath)
